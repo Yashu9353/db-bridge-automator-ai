@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,7 +19,30 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ["IBM Plex Sans", "sans-serif"],
+				mono: ["IBM Plex Mono", "monospace"],
+			},
 			colors: {
+				// IBM Carbon color palette
+				"carbon-blue": "#0f62fe",
+				"carbon-blue-60": "#0353e9",
+				"carbon-blue-70": "#0530ad",
+				"carbon-blue-80": "#061f80",
+				"carbon-gray-10": "#f4f4f4",
+				"carbon-gray-20": "#e0e0e0", 
+				"carbon-gray-30": "#c6c6c6",
+				"carbon-gray-40": "#a8a8a8",
+				"carbon-gray-50": "#8d8d8d",
+				"carbon-gray-60": "#6f6f6f",
+				"carbon-gray-70": "#525252",
+				"carbon-gray-80": "#393939",
+				"carbon-gray-90": "#262626",
+				"carbon-gray-100": "#161616",
+				"carbon-error": "#da1e28",
+				"carbon-success": "#24a148",
+				"carbon-warning": "#f1c21b",
+				"carbon-info": "#0043ce",
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
