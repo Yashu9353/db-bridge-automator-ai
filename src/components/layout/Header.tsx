@@ -1,8 +1,10 @@
 
-import { useState } from "react";
-import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { useState, useContext } from "react";
+import { Menu, X, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import IBMLogo from "../icons/IBMLogo";
+import { AuthContext } from "../../App";
+import { useNavigate } from "react-router-dom";
 
 type HeaderProps = {
   toggleSidebar: () => void;
@@ -23,10 +25,17 @@ const questionnaires: QuestionnaireItem[] = [
 
 const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
   const [isQuestionnairesOpen, setIsQuestionnairesOpen] = useState(false);
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   
   return (
-    <header className="bg-carbon-gray-100 text-white">
-      <div className="flex items-center justify-between p-4">
+    <header className="bg-carbon-gray-100 text-white fixed top-0 left-0 right-0 z-30 h-16">
+      <div className="flex items-center justify-between p-4 h-full">
         <div className="flex items-center gap-4">
           <button 
             onClick={toggleSidebar}
@@ -44,39 +53,49 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
           </div>
         </div>
 
-        <div className="relative">
-          <button
-            onClick={() => setIsQuestionnairesOpen(!isQuestionnairesOpen)}
-            className="flex items-center gap-2 px-3 py-2 hover:bg-carbon-blue transition-colors"
-          >
-            <span>Questionnaires</span>
-            {isQuestionnairesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-          
-          {isQuestionnairesOpen && (
-            <div className="absolute right-0 mt-1 bg-white text-carbon-gray-100 shadow-lg border border-carbon-gray-20 w-72 z-50">
-              <ul className="py-1">
-                {questionnaires.map((item) => (
-                  <li key={item.id}>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <button
+              onClick={() => setIsQuestionnairesOpen(!isQuestionnairesOpen)}
+              className="flex items-center gap-2 px-3 py-2 hover:bg-carbon-blue transition-colors"
+            >
+              <span>Questionnaires</span>
+              {isQuestionnairesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+            
+            {isQuestionnairesOpen && (
+              <div className="absolute right-0 mt-1 bg-white text-carbon-gray-100 shadow-lg border border-carbon-gray-20 w-72 z-50">
+                <ul className="py-1">
+                  {questionnaires.map((item) => (
+                    <li key={item.id}>
+                      <a 
+                        href={`/questionnaire/${item.id}`}
+                        className="block px-4 py-2 text-sm hover:bg-carbon-gray-10 transition-colors"
+                      >
+                        {item.title}
+                      </a>
+                    </li>
+                  ))}
+                  <li className="border-t border-carbon-gray-20">
                     <a 
-                      href={`/questionnaire/${item.id}`}
-                      className="block px-4 py-2 text-sm hover:bg-carbon-gray-10 transition-colors"
+                      href="/questionnaire/create"
+                      className="block px-4 py-2 text-sm text-carbon-blue hover:bg-carbon-gray-10 transition-colors"
                     >
-                      {item.title}
+                      Create New Questionnaire
                     </a>
                   </li>
-                ))}
-                <li className="border-t border-carbon-gray-20">
-                  <a 
-                    href="/questionnaire/create"
-                    className="block px-4 py-2 text-sm text-carbon-blue hover:bg-carbon-gray-10 transition-colors"
-                  >
-                    Create New Questionnaire
-                  </a>
-                </li>
-              </ul>
-            </div>
-          )}
+                </ul>
+              </div>
+            )}
+          </div>
+          
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-2 hover:bg-carbon-blue transition-colors"
+            title="Log out"
+          >
+            <LogOut size={18} />
+          </button>
         </div>
       </div>
     </header>

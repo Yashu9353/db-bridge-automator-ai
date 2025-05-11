@@ -1,23 +1,52 @@
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import IBMLogo from "../icons/IBMLogo";
+import { AuthContext } from "../../App";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would authenticate with a backend
-    console.log("Login with:", { email, password, rememberMe });
+    setIsLoading(true);
     
-    // For demo purposes, redirect to dashboard
-    window.location.href = "/";
+    try {
+      // Simulate network request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Call login function from context
+      const success = login(email, password);
+      
+      if (success) {
+        toast({
+          title: "Login successful",
+          description: "Welcome to IBM Database Migration Tool",
+          variant: "default",
+        });
+        
+        navigate("/");
+      }
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "Invalid email or password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -65,6 +94,7 @@ const LoginForm = () => {
                 className="carbon-field"
                 required
                 placeholder="Enter your email"
+                disabled={isLoading}
               />
             </div>
             
@@ -83,6 +113,7 @@ const LoginForm = () => {
                 className="carbon-field"
                 required
                 placeholder="Enter your password"
+                disabled={isLoading}
               />
             </div>
             
@@ -93,6 +124,7 @@ const LoginForm = () => {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(!!checked)}
                   className="carbon-checkbox"
+                  disabled={isLoading}
                 />
                 <Label htmlFor="remember-me" className="text-sm text-carbon-gray-70">
                   Remember me
@@ -103,8 +135,9 @@ const LoginForm = () => {
             <Button
               type="submit"
               className="w-full carbon-button-primary"
+              disabled={isLoading}
             >
-              Sign in
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
           
