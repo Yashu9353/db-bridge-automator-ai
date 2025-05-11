@@ -17,7 +17,7 @@ import NotFound from "./pages/NotFound";
 // Create auth context
 export const AuthContext = createContext({
   isAuthenticated: false,
-  login: (email: string, password: string) => {},
+  login: (email: string, password: string): boolean => false,
   logout: () => {}
 });
 
@@ -32,11 +32,14 @@ const App = () => {
     const auth = localStorage.getItem("ibm-migration-auth");
     if (auth) {
       setIsAuthenticated(true);
+    } else {
+      // Force logout if no auth data is found
+      setIsAuthenticated(false);
     }
   }, []);
 
   // Login function
-  const login = (email: string, password: string) => {
+  const login = (email: string, password: string): boolean => {
     // For demo purposes, accept any email/password combination
     localStorage.setItem("ibm-migration-auth", JSON.stringify({ email }));
     setIsAuthenticated(true);
