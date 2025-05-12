@@ -14,7 +14,7 @@ const Questionnaire = () => {
           Answer a few questions to configure your database migration project
         </p>
         
-        <QuestionnaireForm />
+        <QuestionnaireForm questionnaireId={id} />
       </div>
     </Layout>
   );

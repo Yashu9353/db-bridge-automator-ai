@@ -6,7 +6,6 @@ import {
   TextInput,
   Button,
   InlineNotification,
-  Stack,
 } from "@carbon/react";
 import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
@@ -49,15 +48,17 @@ const LoginForm = () => {
         {error && (
           <InlineNotification
             kind="error"
-            title="Error:"
+            title="Error"
             subtitle={error}
-            hideCloseButton
+            role="alert"
+            onCloseButtonClick={() => setError("")}
+            hideCloseButton={true}
             style={{ marginBottom: '1rem' }}
           />
         )}
 
         <Form onSubmit={handleSubmit}>
-          <Stack gap={7}>
+          <div className="space-y-6">
             <FormGroup legendText="Login credentials">
               <TextInput
                 id="email"
@@ -84,7 +85,7 @@ const LoginForm = () => {
             <p className="text-sm text-center text-gray-600">
               For demo purposes, any email/password will work
             </p>
-          </Stack>
+          </div>
         </Form>
       </div>
     </div>

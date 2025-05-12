@@ -42,6 +42,10 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
     logout();
     navigate("/login");
   };
+
+  const handleQuestionnaireClick = (id: string) => {
+    navigate(`/questionnaire/${id}`);
+  };
   
   return (
     <CarbonHeader aria-label="IBM AI Database Migration">
@@ -61,11 +65,14 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
       <HeaderNavigation aria-label="Main navigation">
         <HeaderMenu menuLinkName="Questionnaires" aria-label="Questionnaires">
           {questionnaires.map((item) => (
-            <HeaderMenuItem href={`/questionnaire/${item.id}`} key={item.id}>
+            <HeaderMenuItem 
+              key={item.id}
+              onClick={() => handleQuestionnaireClick(item.id)}
+            >
               {item.title}
             </HeaderMenuItem>
           ))}
-          <HeaderMenuItem href="/questionnaire/create">
+          <HeaderMenuItem onClick={() => navigate("/questionnaire/create")}>
             Create New Questionnaire
           </HeaderMenuItem>
         </HeaderMenu>

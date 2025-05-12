@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   {
@@ -27,7 +27,11 @@ const steps = [
   },
 ];
 
-const QuestionnaireForm = () => {
+type QuestionnaireFormProps = {
+  questionnaireId?: string;
+};
+
+const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     sourceDb: "",
@@ -37,6 +41,53 @@ const QuestionnaireForm = () => {
     strictMode: false,
     useFeedbackDb: true,
   });
+  const navigate = useNavigate();
+
+  // Effect to set form data based on questionnaire ID
+  useEffect(() => {
+    if (questionnaireId) {
+      console.log(`Loading questionnaire: ${questionnaireId}`);
+      // Here you would typically fetch questionnaire data based on the ID
+      // For demo purposes, we'll just pre-populate based on the ID
+      if (questionnaireId === "db-migration") {
+        setFormData({
+          sourceDb: "oracle",
+          targetDb: "db2",
+          conversionType: "sql",
+          optimizationLevel: "moderate",
+          strictMode: true,
+          useFeedbackDb: true,
+        });
+      } else if (questionnaireId === "sp-conversion") {
+        setFormData({
+          sourceDb: "sqlserver",
+          targetDb: "db2-cloud",
+          conversionType: "stored-procedures",
+          optimizationLevel: "aggressive",
+          strictMode: false,
+          useFeedbackDb: true,
+        });
+      } else if (questionnaireId === "optimization") {
+        setFormData({
+          sourceDb: "postgresql",
+          targetDb: "netezza",
+          conversionType: "both",
+          optimizationLevel: "aggressive",
+          strictMode: false,
+          useFeedbackDb: true,
+        });
+      } else if (questionnaireId === "schema-mapping") {
+        setFormData({
+          sourceDb: "teradata",
+          targetDb: "db2-warehouse",
+          conversionType: "sql",
+          optimizationLevel: "minimal",
+          strictMode: true,
+          useFeedbackDb: false,
+        });
+      }
+    }
+  }, [questionnaireId]);
 
   const updateFormData = (key: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -292,7 +343,7 @@ const QuestionnaireForm = () => {
                 // For demo purposes, just log the form data
                 console.log("Questionnaire submitted:", formData);
                 // Redirect to the dashboard
-                window.location.href = "/";
+                navigate("/");
               }}
             >
               Start Migration
