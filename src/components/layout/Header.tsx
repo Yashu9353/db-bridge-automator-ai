@@ -44,6 +44,7 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
   };
 
   const handleQuestionnaireClick = (id: string) => {
+    console.log(`Navigating to questionnaire: ${id}`);
     navigate(`/questionnaire/${id}`);
   };
   
