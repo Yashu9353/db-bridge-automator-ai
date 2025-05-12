@@ -6,6 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect, createContext } from "react";
 
+// Import Carbon styles
+import '@carbon/styles/css/styles.css';
+
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Questionnaire from "./pages/Questionnaire";

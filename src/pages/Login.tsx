@@ -1,8 +1,13 @@
 
+import { Content } from "@carbon/react";
 import LoginForm from "../components/auth/LoginForm";
 
 const Login = () => {
-  return <LoginForm />;
+  return (
+    <Content>
+      <LoginForm />
+    </Content>
+  );
 };
 
 export default Login;

@@ -1,10 +1,20 @@
 
 import { useState, useContext } from "react";
-import { Menu, X, ChevronDown, ChevronUp, LogOut } from "lucide-react";
-import { cn } from "@/lib/utils";
-import IBMLogo from "../icons/IBMLogo";
+import {
+  Header as CarbonHeader,
+  HeaderGlobalAction,
+  HeaderMenuButton,
+  HeaderName,
+  HeaderPanel,
+  HeaderGlobalBar,
+  HeaderNavigation,
+  HeaderMenu,
+  HeaderMenuItem,
+} from "@carbon/react";
+import { Logout, ChevronDown, Menu, Close } from "@carbon/react/icons";
 import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
+import IBMLogo from "../icons/IBMLogo";
 
 type HeaderProps = {
   toggleSidebar: () => void;
@@ -34,71 +44,43 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
   };
   
   return (
-    <header className="bg-carbon-gray-100 text-white fixed top-0 left-0 right-0 z-30 h-16">
-      <div className="flex items-center justify-between p-4 h-full">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={toggleSidebar}
-            className="text-white hover:text-carbon-gray-30 transition-colors"
-            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-          >
-            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <IBMLogo className="h-8 w-8" />
-            <span className="text-lg font-medium hidden md:block">
-              AI Database Migration
-            </span>
-          </div>
+    <CarbonHeader aria-label="IBM AI Database Migration">
+      <HeaderMenuButton
+        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+        onClick={toggleSidebar}
+        isActive={sidebarOpen}
+      />
+      
+      <HeaderName prefix="" href="/">
+        <div className="flex items-center gap-2">
+          <IBMLogo className="h-6 w-6" />
+          <span className="hidden md:block">AI Database Migration</span>
         </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <button
-              onClick={() => setIsQuestionnairesOpen(!isQuestionnairesOpen)}
-              className="flex items-center gap-2 px-3 py-2 hover:bg-carbon-blue transition-colors"
-            >
-              <span>Questionnaires</span>
-              {isQuestionnairesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-            
-            {isQuestionnairesOpen && (
-              <div className="absolute right-0 mt-1 bg-white text-carbon-gray-100 shadow-lg border border-carbon-gray-20 w-72 z-50">
-                <ul className="py-1">
-                  {questionnaires.map((item) => (
-                    <li key={item.id}>
-                      <a 
-                        href={`/questionnaire/${item.id}`}
-                        className="block px-4 py-2 text-sm hover:bg-carbon-gray-10 transition-colors"
-                      >
-                        {item.title}
-                      </a>
-                    </li>
-                  ))}
-                  <li className="border-t border-carbon-gray-20">
-                    <a 
-                      href="/questionnaire/create"
-                      className="block px-4 py-2 text-sm text-carbon-blue hover:bg-carbon-gray-10 transition-colors"
-                    >
-                      Create New Questionnaire
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-          
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-2 hover:bg-carbon-blue transition-colors"
-            title="Log out"
-          >
-            <LogOut size={18} />
-          </button>
-        </div>
-      </div>
-    </header>
+      </HeaderName>
+      
+      <HeaderNavigation aria-label="Main navigation">
+        <HeaderMenu menuLinkName="Questionnaires" aria-label="Questionnaires">
+          {questionnaires.map((item) => (
+            <HeaderMenuItem href={`/questionnaire/${item.id}`} key={item.id}>
+              {item.title}
+            </HeaderMenuItem>
+          ))}
+          <HeaderMenuItem href="/questionnaire/create">
+            Create New Questionnaire
+          </HeaderMenuItem>
+        </HeaderMenu>
+      </HeaderNavigation>
+      
+      <HeaderGlobalBar>
+        <HeaderGlobalAction
+          aria-label="Log out"
+          onClick={handleLogout}
+          tooltipAlignment="end"
+        >
+          <Logout size={20} />
+        </HeaderGlobalAction>
+      </HeaderGlobalBar>
+    </CarbonHeader>
   );
 };
 
