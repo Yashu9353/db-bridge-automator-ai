@@ -4,9 +4,7 @@ import Layout from "@/components/layout/Layout";
 import QuestionnaireForm from "@/components/questionnaire/QuestionnaireForm";
 
 const Questionnaire = () => {
-  const { id } = useParams<{ id: string }>();
-  
-  console.log(`Questionnaire page loaded with ID: ${id}`);
+  const { id } = useParams();
   
   return (
     <Layout>

@@ -76,10 +76,6 @@ const App = () => {
                 element={isAuthenticated ? <Questionnaire /> : <Navigate to="/login" />} 
               />
               <Route 
-                path="/questionnaire/create" 
-                element={isAuthenticated ? <Questionnaire /> : <Navigate to="/login" />} 
-              />
-              <Route 
                 path="/scripts/upload" 
                 element={isAuthenticated ? <ScriptUpload /> : <Navigate to="/login" />} 
               />
