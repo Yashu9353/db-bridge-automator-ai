@@ -11,7 +11,7 @@ import {
   HeaderMenu,
   HeaderMenuItem,
 } from "@carbon/react";
-import { Logout, ChevronDown, Menu, Close } from "@carbon/react/icons";
+import { Logout, ChevronDown, Menu, Close } from "@carbon/icons-react";
 import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import IBMLogo from "../icons/IBMLogo";

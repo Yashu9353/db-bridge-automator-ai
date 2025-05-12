@@ -1,5 +1,6 @@
 
-import { Upload, Database, Play, ChevronRight } from "lucide-react";
+import { Upload, Database, Play } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const QuickActions = () => {
   const actions = [
@@ -29,18 +30,18 @@ const QuickActions = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {actions.map((action) => (
-        <a 
+        <Link
           key={action.title}
-          href={action.href}
+          to={action.href}
           className={`${action.color} p-4 flex flex-col hover:shadow-md transition-shadow`}
         >
           <div className="flex justify-between items-center mb-3">
             <action.icon size={24} />
-            <ChevronRight size={18} />
+            <span className="text-sm">→</span>
           </div>
           <h3 className="font-medium text-lg mb-1">{action.title}</h3>
           <p className="text-sm opacity-80">{action.description}</p>
-        </a>
+        </Link>
       ))}
     </div>
   );

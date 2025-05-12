@@ -1,11 +1,13 @@
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { 
   Home, Database, FileCode, Play, 
-  CheckSquare, AlertCircle, BarChart, Settings, 
+  CheckSquare, AlertTriangle, BarChart, Settings, 
   Users, ChevronRight, ChevronDown, LogOut 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../App";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -41,7 +43,7 @@ const navItems: NavItem[] = [
   },
   { label: "Run Migrations", icon: Play, href: "/run" },
   { label: "Validation Results", icon: CheckSquare, href: "/validation" },
-  { label: "Issues & Fixes", icon: AlertCircle, href: "/issues" },
+  { label: "Issues & Fixes", icon: AlertTriangle, href: "/issues" },
   { label: "Reports", icon: BarChart, href: "/reports" },
   { label: "Settings", icon: Settings, href: "/settings" },
   { label: "User Management", icon: Users, href: "/users" },
@@ -49,6 +51,13 @@ const navItems: NavItem[] = [
 
 const Sidebar = ({ isOpen }: SidebarProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const toggleExpanded = (label: string) => {
     setExpandedItems(prev => 
@@ -94,20 +103,20 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                       <ul className="pl-9 mt-1 space-y-1">
                         {item.children.map(child => (
                           <li key={child.label}>
-                            <a
-                              href={child.href}
+                            <Link
+                              to={child.href}
                               className="block px-3 py-1.5 text-sm text-carbon-gray-70 hover:bg-carbon-gray-20 rounded-sm"
                             >
                               {child.label}
-                            </a>
+                            </Link>
                           </li>
                         ))}
                       </ul>
                     )}
                   </div>
                 ) : (
-                  <a
-                    href={item.href}
+                  <Link
+                    to={item.href}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 hover:bg-carbon-gray-20 rounded-sm",
                       item.active 
@@ -117,7 +126,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                   >
                     <item.icon size={18} />
                     <span className="text-sm font-medium">{item.label}</span>
-                  </a>
+                  </Link>
                 )}
               </li>
             ))}
@@ -134,7 +143,10 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
               <p className="text-xs text-carbon-gray-60">Administrator</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 text-carbon-gray-70 hover:text-carbon-blue text-sm mt-2">
+          <button 
+            className="flex items-center gap-2 text-carbon-gray-70 hover:text-carbon-blue text-sm mt-2"
+            onClick={handleLogout}
+          >
             <LogOut size={16} />
             <span>Log out</span>
           </button>
