@@ -59,7 +59,7 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
       <HeaderName prefix="" href="/">
         <div className="flex items-center gap-2">
           <IBMLogo className="h-6 w-6" />
-          <span className="hidden md:block">AI Database Migration</span>
+          <span className="hidden md:block">Database Migration</span>
         </div>
       </HeaderName>
       

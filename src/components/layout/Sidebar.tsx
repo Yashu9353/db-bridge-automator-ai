@@ -139,7 +139,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
               JD
             </div>
             <div>
-              <p className="text-sm font-medium text-carbon-gray-90">John Doe</p>
+              <p className="text-sm font-medium text-carbon-gray-90">Logged in</p>
               <p className="text-xs text-carbon-gray-60">Administrator</p>
             </div>
           </div>

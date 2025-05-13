@@ -40,7 +40,7 @@ const LoginForm = () => {
           <div className="flex items-center gap-4">
             <IBMLogo className="h-10 w-10" />
             <span className="text-2xl font-bold text-gray-900">
-              AI Database Migration
+              Database Migration
             </span>
           </div>
         </div>
@@ -82,9 +82,7 @@ const LoginForm = () => {
               Log in
             </Button>
             
-            <p className="text-sm text-center text-gray-600">
-              For demo purposes, any email/password will work
-            </p>
+          
           </div>
         </Form>
       </div>

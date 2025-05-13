@@ -47,7 +47,6 @@ const SourceTargetStep = ({ sourceDb, targetDb, updateFormData }: SourceTargetSt
               <SelectItem value="db2">IBM Db2</SelectItem>
               <SelectItem value="db2-cloud">IBM Db2 on Cloud</SelectItem>
               <SelectItem value="db2-warehouse">IBM Db2 Warehouse</SelectItem>
-              <SelectItem value="netezza">IBM Netezza</SelectItem>
             </SelectContent>
           </Select>
         </div>

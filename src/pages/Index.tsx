@@ -12,7 +12,7 @@ const Index = () => {
     <Layout>
       <div className="space-y-6">
         <div className="bg-carbon-blue-70 -mx-6 -mt-6 px-6 py-8 text-white">
-          <h1 className="text-2xl font-light mb-2">Welcome to AI Database Migration</h1>
+          <h1 className="text-2xl font-light mb-2">Welcome to IBM Database Modernization</h1>
           <p className="opacity-80 max-w-3xl">
             Automate your database migration from various platforms to IBM databases using our AI-powered conversion tool.
             Configure your databases, upload scripts, and run migrations with ease.

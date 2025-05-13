@@ -144,7 +144,7 @@ const FileUploader = () => {
           <span className="font-medium">Click to browse</span> or drag and drop
         </p>
         <p className="text-carbon-gray-60 text-sm">
-          Upload SQL, BTEQ, or text files (max 10MB per file)
+          Upload SQL, BTEQ, or text files
         </p>
       </div>
       
