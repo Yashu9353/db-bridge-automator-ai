@@ -1,73 +1,73 @@
-# Welcome to your Lovable project
 
-## Project info
+# IBM AI Database Migration Tool
 
-**URL**: https://lovable.dev/projects/610ee47d-465d-44e2-831f-197db063f471
+This is a web application built using IBM Carbon Design System for database migration tasks.
 
-## How can I edit this code?
+## Prerequisites
 
-There are several ways of editing your application.
+- Node.js (v16 or later)
+- npm or yarn
 
-**Use Lovable**
+## Installation Instructions
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/610ee47d-465d-44e2-831f-197db063f471) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd database-migration-tool
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies
+```bash
+npm install
+# or
+yarn install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Start the development server
+```bash
+npm run dev
+# or
+yarn dev
+```
 
-**Use GitHub Codespaces**
+4. Open your browser and navigate to http://localhost:5173
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Carbon Design System
 
-## What technologies are used for this project?
+This project is built with the IBM Carbon Design System. The Carbon Design System is IBM's open-source design system for products and digital experiences.
 
-This project is built with:
+### Key Carbon Components Used:
+- Carbon Header
+- Carbon Navigation
+- Carbon Forms and Inputs
+- Carbon Tables
+- Carbon Buttons and UI elements
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Project Structure
 
-## How can I deploy this project?
+- `/src/components` - Reusable UI components
+- `/src/pages` - Page components for each route
+- `/src/components/layout` - Layout components like Header, Sidebar
+- `/src/components/questionnaire` - Components for the migration questionnaire
+- `/src/components/ui` - Shared UI components based on Carbon Design System
 
-Simply open [Lovable](https://lovable.dev/projects/610ee47d-465d-44e2-831f-197db063f471) and click on Share -> Publish.
+## Required Packages
 
-## Can I connect a custom domain to my Lovable project?
+These packages are required for the IBM Carbon Design System:
+- @carbon/react
+- @carbon/styles
 
-Yes, you can!
+To install them:
+```bash
+npm install @carbon/react @carbon/styles
+# or
+yarn add @carbon/react @carbon/styles
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Key Features
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. Dashboard with migration status and recent migrations
+2. Questionnaire workflow for setting up migrations
+3. Database connection management
+4. SQL script management and conversion
+5. Migration execution and validation

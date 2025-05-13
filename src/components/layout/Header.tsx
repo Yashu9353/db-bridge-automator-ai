@@ -11,7 +11,7 @@ import {
   HeaderMenu,
   HeaderMenuItem,
 } from "@carbon/react";
-import { Logout } from "lucide-react"; // Changed import from @carbon/icons-react to lucide-react
+import { LogOut } from "lucide-react"; // Fixed icon name from Logout to LogOut
 import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import IBMLogo from "../icons/IBMLogo";
@@ -85,7 +85,7 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
           onClick={handleLogout}
           tooltipAlignment="end"
         >
-          <Logout size={20} />
+          <LogOut size={20} />
         </HeaderGlobalAction>
       </HeaderGlobalBar>
     </CarbonHeader>
