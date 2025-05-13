@@ -23,14 +23,21 @@ npm install
 yarn install
 ```
 
-3. Start the development server
+3. Install Carbon Design System packages
+```bash
+npm install @carbon/react@1.41.0 @carbon/styles@1.81.0
+# or
+yarn add @carbon/react@1.41.0 @carbon/styles@1.81.0
+```
+
+4. Start the development server
 ```bash
 npm run dev
 # or
 yarn dev
 ```
 
-4. Open your browser and navigate to http://localhost:5173
+5. Open your browser and navigate to http://localhost:5173
 
 ## Carbon Design System
 
