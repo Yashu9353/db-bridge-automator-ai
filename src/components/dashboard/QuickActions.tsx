@@ -22,7 +22,7 @@ const QuickActions = () => {
       title: "Run Migration",
       description: "Execute database migration and conversion",
       icon: Play,
-      href: "/run",
+      href: "/conversion/editor",
       color: "bg-carbon-blue-80 text-white"
     }
   ];
