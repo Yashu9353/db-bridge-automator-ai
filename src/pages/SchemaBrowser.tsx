@@ -1,10 +1,9 @@
-
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Database, Table as TableIcon, FileCode, Function, Key } from "lucide-react";
+import { Database, Table as TableIcon, FileCode, Activity, Key } from "lucide-react";
 
 // Schema browser component
 const SchemaBrowser = () => {
@@ -104,8 +103,8 @@ const SchemaBrowser = () => {
                   <AccordionContent className="p-2 space-y-1">
                     {renderSchemaItem({ name: "Tables" }, <TableIcon size={16} className="text-carbon-blue" />)}
                     {renderSchemaItem({ name: "Views" }, <TableIcon size={16} className="text-carbon-green" />)}
-                    {renderSchemaItem({ name: "Stored Procedures" }, <Function size={16} className="text-carbon-purple" />)}
-                    {renderSchemaItem({ name: "Functions" }, <Function size={16} className="text-carbon-teal" />)}
+                    {renderSchemaItem({ name: "Stored Procedures" }, <Activity size={16} className="text-carbon-purple" />)}
+                    {renderSchemaItem({ name: "Functions" }, <Activity size={16} className="text-carbon-teal" />)}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="scripts">
