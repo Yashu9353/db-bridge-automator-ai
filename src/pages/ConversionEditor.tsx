@@ -172,8 +172,8 @@ const ConversionEditor = () => {
                       SELECT COUNT(*) 
                       FROM order_db.orders b2 
                       WHERE b2.customer_id = a.customer_id 
-                      AND (b2.order_date > b.order_date OR 
-                          (b2.order_date = b.order_date AND b2.order_id > b.order_id))
+                      AND (b2.order_date {'>'} b.order_date OR 
+                          (b2.order_date = b.order_date AND b2.order_id {'>'} b.order_id))
                     ) = 0;
                   </div>
                 </div>
