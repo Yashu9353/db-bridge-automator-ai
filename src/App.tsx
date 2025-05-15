@@ -101,6 +101,11 @@ const App = () => {
                 path="/conversion/editor" 
                 element={isAuthenticated ? <ConversionEditor /> : <Navigate to="/login" />} 
               />
+              {/* Add redirect for /run to /conversion/editor */}
+              <Route 
+                path="/run" 
+                element={<Navigate to="/conversion/editor" replace />} 
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
