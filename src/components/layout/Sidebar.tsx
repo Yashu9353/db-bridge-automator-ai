@@ -1,4 +1,3 @@
-
 import { useState, useContext } from "react";
 import { 
   Home, Database, FileCode, Play, 
@@ -37,7 +36,6 @@ const navItems: NavItem[] = [
     icon: FileCode, 
     href: "#",
     children: [
-      { label: "Upload Scripts", icon: ChevronRight, href: "/scripts/upload" },
       { label: "Manage Scripts", icon: ChevronRight, href: "/scripts/manage" },
     ] 
   },

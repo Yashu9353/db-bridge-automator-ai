@@ -13,7 +13,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Questionnaire from "./pages/Questionnaire";
 import ScriptUpload from "./pages/ScriptUpload";
+import ManageScripts from "./pages/ManageScripts";
 import DatabaseConnections from "./pages/DatabaseConnections";
+import SchemaBrowser from "./pages/SchemaBrowser";
 import ConversionEditor from "./pages/ConversionEditor";
 import NotFound from "./pages/NotFound";
 
@@ -84,8 +86,16 @@ const App = () => {
                 element={isAuthenticated ? <ScriptUpload /> : <Navigate to="/login" />} 
               />
               <Route 
+                path="/scripts/manage" 
+                element={isAuthenticated ? <ManageScripts /> : <Navigate to="/login" />} 
+              />
+              <Route 
                 path="/database/connections" 
                 element={isAuthenticated ? <DatabaseConnections /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/database/schema" 
+                element={isAuthenticated ? <SchemaBrowser /> : <Navigate to="/login" />} 
               />
               <Route 
                 path="/conversion/editor" 
