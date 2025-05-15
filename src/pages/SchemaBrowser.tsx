@@ -1,104 +1,253 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Database, Table as TableIcon, FileCode, Activity, Key } from "lucide-react";
+import { Database, Table as TableIcon, FileCode, Activity, Key, Loader2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { fetchDatabaseSchema, getDatabaseConnections } from "@/services/databaseService";
 
 // Schema browser component
 const SchemaBrowser = () => {
-  const [selectedDatabase, setSelectedDatabase] = useState("teradata");
+  const [activeSchema, setActiveSchema] = useState("SALES");
+  const [activeItem, setActiveItem] = useState("Tables");
+  const [isLoading, setIsLoading] = useState(true);
+  const [schemaData, setSchemaData] = useState<any>(null);
   
-  // Sample schema data - in a real application, this would come from an API
-  const schemaData = {
-    tables: [
-      { name: "customer", columns: 12, rows: "1.2M", lastUpdated: "2023-06-15" },
-      { name: "orders", columns: 8, rows: "3.5M", lastUpdated: "2023-06-14" },
-      { name: "products", columns: 15, rows: "45K", lastUpdated: "2023-06-10" },
-      { name: "inventory", columns: 6, rows: "120K", lastUpdated: "2023-06-12" },
-    ],
-    views: [
-      { name: "customer_orders", baseTables: "customer, orders", created: "2023-05-10" },
-      { name: "inventory_status", baseTables: "inventory, products", created: "2023-04-25" },
-      { name: "sales_summary", baseTables: "orders, products", created: "2023-06-01" },
-    ],
-    procedures: [
-      { name: "update_inventory", parameters: 3, lastModified: "2023-05-20" },
-      { name: "process_order", parameters: 5, lastModified: "2023-06-05" },
-      { name: "generate_report", parameters: 2, lastModified: "2023-05-15" },
-    ],
-    functions: [
-      { name: "calculate_tax", returnType: "DECIMAL", parameters: 2 },
-      { name: "format_address", returnType: "VARCHAR", parameters: 4 },
-      { name: "validate_email", returnType: "BOOLEAN", parameters: 1 },
-    ],
-    scripts: [
-      { name: "daily_etl.sql", type: "SQL", size: "15KB", lastModified: "2023-06-10" },
-      { name: "load_data.bteq", type: "BTEQ", size: "22KB", lastModified: "2023-05-28" },
-      { name: "update_stats.sql", type: "SQL", size: "8KB", lastModified: "2023-06-12" },
-    ],
-    security: [
-      { name: "GRANT_SALES_ACCESS", type: "GRANT", object: "sales_data", role: "sales_analyst" },
-      { name: "REVOKE_ADMIN", type: "REVOKE", object: "system_config", role: "app_user" },
-      { name: "GRANT_REPORTING", type: "GRANT", object: "reporting_views", role: "report_user" },
-    ]
-  };
-
-  const databases = [
-    { id: "teradata", name: "Teradata", type: "Source" },
-    { id: "db2", name: "IBM Db2", type: "Target" }
-  ];
-
-  const renderSchemaItem = (item: any, icon: React.ReactNode) => (
-    <div className="flex items-center gap-3 p-2 hover:bg-carbon-gray-10 rounded cursor-pointer">
+  useEffect(() => {
+    const loadSchema = async () => {
+      setIsLoading(true);
+      try {
+        // Check for active database connections
+        const connections = getDatabaseConnections();
+        
+        if (!connections.source) {
+          toast({
+            title: "No source database",
+            description: "Please configure a source database connection first",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        // Fetch schema data from our simulated backend
+        const data = await fetchDatabaseSchema(connections.source.id);
+        setSchemaData(data);
+      } catch (error) {
+        toast({
+          title: "Failed to load schema",
+          description: "Could not retrieve database schema information",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadSchema();
+  }, []);
+  
+  // Helper to render schema items in the sidebar
+  const renderSchemaItem = (item: { name: string }, icon: React.ReactNode) => (
+    <div
+      className={`flex items-center text-sm p-2 cursor-pointer ${
+        activeItem === item.name ? "bg-carbon-blue bg-opacity-10 text-carbon-blue font-medium" : "hover:bg-gray-100"
+      }`}
+      onClick={() => setActiveItem(item.name)}
+    >
       {icon}
-      <span>{item.name}</span>
+      <span className="ml-2">{item.name}</span>
     </div>
   );
-
+  
+  // Helper to render content based on active schema and item
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 size={32} className="animate-spin text-carbon-blue" />
+          <span className="ml-2 text-carbon-gray-70">Loading schema information...</span>
+        </div>
+      );
+    }
+    
+    if (!schemaData) {
+      return (
+        <div className="text-center py-16">
+          <p className="text-carbon-gray-70">No database connection available.</p>
+          <p className="text-carbon-gray-60 mt-2">Please configure a source database connection first.</p>
+        </div>
+      );
+    }
+    
+    const schema = schemaData.schemas.find((s: any) => s.name === activeSchema);
+    if (!schema) {
+      return <div>Schema not found</div>;
+    }
+    
+    switch (activeItem) {
+      case "Tables":
+        return (
+          <div>
+            <h3 className="text-lg font-medium mb-4">Tables in {activeSchema}</h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/3">Table Name</TableHead>
+                  <TableHead>Columns</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {schema.tables.map((table: any) => (
+                  <TableRow key={table.name}>
+                    <TableCell className="font-medium">{table.name}</TableCell>
+                    <TableCell>{table.columns.join(", ")}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        );
+        
+      case "Views":
+        return (
+          <div>
+            <h3 className="text-lg font-medium mb-4">Views in {activeSchema}</h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/3">View Name</TableHead>
+                  <TableHead>Definition</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {schema.views.map((view: any) => (
+                  <TableRow key={view.name}>
+                    <TableCell className="font-medium">{view.name}</TableCell>
+                    <TableCell>
+                      <pre className="text-xs whitespace-pre-wrap">{view.definition}</pre>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        );
+        
+      case "Stored Procedures":
+        return (
+          <div>
+            <h3 className="text-lg font-medium mb-4">Stored Procedures in {activeSchema}</h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/3">Procedure Name</TableHead>
+                  <TableHead>Parameters</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {schema.procedures.map((proc: any) => (
+                  <TableRow key={proc.name}>
+                    <TableCell className="font-medium">{proc.name}</TableCell>
+                    <TableCell>{proc.parameters.join(", ")}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        );
+        
+      case "Functions":
+        return (
+          <div>
+            <h3 className="text-lg font-medium mb-4">Functions in {activeSchema}</h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/3">Function Name</TableHead>
+                  <TableHead>Parameters</TableHead>
+                  <TableHead>Return Type</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {schema.functions.map((func: any) => (
+                  <TableRow key={func.name}>
+                    <TableCell className="font-medium">{func.name}</TableCell>
+                    <TableCell>{func.parameters.join(", ")}</TableCell>
+                    <TableCell>{func.returnType}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        );
+        
+      default:
+        return <div>Select an item from the sidebar</div>;
+    }
+  };
+  
   return (
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-medium text-carbon-gray-100">Schema Browser</h1>
+          <h1 className="text-2xl font-medium text-carbon-gray-100">Database Schema Browser</h1>
           <p className="text-carbon-gray-70 mt-1">
-            Browse and explore database schema objects
+            Explore tables, views, stored procedures, and functions in your connected databases
           </p>
         </div>
-
-        <div className="grid grid-cols-12 gap-6">
-          {/* Database selector */}
-          <div className="col-span-12 mb-4">
-            <div className="flex gap-4">
-              {databases.map((db) => (
-                <button
-                  key={db.id}
-                  onClick={() => setSelectedDatabase(db.id)}
-                  className={`px-4 py-2 rounded-md ${
-                    selectedDatabase === db.id
-                      ? "bg-carbon-blue text-white"
-                      : "bg-carbon-gray-10 text-carbon-gray-80 hover:bg-carbon-gray-20"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Database size={18} />
-                    <div>
-                      <div className="font-medium">{db.name}</div>
-                      <div className="text-xs opacity-75">{db.type}</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
+        
+        <div className="flex border border-carbon-gray-20">
+          {/* Sidebar navigation */}
+          <div className="w-64 border-r border-carbon-gray-20 bg-carbon-gray-5">
+            <div className="p-4 border-b border-carbon-gray-20 bg-carbon-gray-10">
+              <h3 className="font-medium">Database Explorer</h3>
             </div>
-          </div>
-
-          {/* Left sidebar for schema navigation */}
-          <div className="col-span-3">
-            <div className="border border-carbon-gray-20 rounded-md overflow-hidden">
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="schema">
-                  <AccordionTrigger className="px-3 py-2 bg-carbon-gray-10 font-medium">
-                    Schema Objects
+            
+            <div className="p-2">
+              <Accordion 
+                type="multiple" 
+                defaultValue={["schemas", "scripts"]}
+                className="space-y-1"
+              >
+                <AccordionItem value="schemas" className="border-b-0">
+                  <AccordionTrigger className="py-2 px-2 hover:bg-carbon-gray-10 hover:no-underline">
+                    <div className="flex items-center text-sm font-medium">
+                      <Database size={16} className="mr-2 text-carbon-blue" />
+                      Schemas
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-2 space-y-1">
+                    {isLoading ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 size={16} className="animate-spin text-carbon-blue" />
+                        <span className="ml-2 text-sm">Loading...</span>
+                      </div>
+                    ) : (
+                      schemaData?.schemas.map((schema: any) => (
+                        <div
+                          key={schema.name}
+                          className={`flex items-center text-sm p-2 cursor-pointer ${
+                            activeSchema === schema.name ? "bg-carbon-blue bg-opacity-5 text-carbon-blue" : "hover:bg-gray-100"
+                          }`}
+                          onClick={() => setActiveSchema(schema.name)}
+                        >
+                          <Database size={16} className="text-carbon-blue-60" />
+                          <span className="ml-2">{schema.name}</span>
+                        </div>
+                      ))
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="objects" className="border-b-0">
+                  <AccordionTrigger className="py-2 px-2 hover:bg-carbon-gray-10 hover:no-underline">
+                    <div className="flex items-center text-sm font-medium">
+                      <TableIcon size={16} className="mr-2 text-carbon-blue" />
+                      Database Objects
+                    </div>
                   </AccordionTrigger>
                   <AccordionContent className="p-2 space-y-1">
                     {renderSchemaItem({ name: "Tables" }, <TableIcon size={16} className="text-carbon-blue" />)}
@@ -107,171 +256,27 @@ const SchemaBrowser = () => {
                     {renderSchemaItem({ name: "Functions" }, <Activity size={16} className="text-carbon-teal" />)}
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="scripts">
-                  <AccordionTrigger className="px-3 py-2 bg-carbon-gray-10 font-medium">
-                    SQL Scripts
+                
+                <AccordionItem value="scripts" className="border-b-0">
+                  <AccordionTrigger className="py-2 px-2 hover:bg-carbon-gray-10 hover:no-underline">
+                    <div className="flex items-center text-sm font-medium">
+                      <FileCode size={16} className="mr-2 text-carbon-blue" />
+                      SQL Scripts
+                    </div>
                   </AccordionTrigger>
                   <AccordionContent className="p-2 space-y-1">
                     {renderSchemaItem({ name: "SQL" }, <FileCode size={16} className="text-carbon-blue" />)}
                     {renderSchemaItem({ name: "BTEQ" }, <FileCode size={16} className="text-carbon-orange" />)}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="security">
-                  <AccordionTrigger className="px-3 py-2 bg-carbon-gray-10 font-medium">
-                    Security
-                  </AccordionTrigger>
-                  <AccordionContent className="p-2 space-y-1">
-                    {renderSchemaItem({ name: "DCL (Grant/Revoke)" }, <Key size={16} className="text-carbon-red" />)}
+                    {renderSchemaItem({ name: "DCL" }, <Key size={16} className="text-carbon-purple" />)}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
             </div>
           </div>
-
+          
           {/* Main content area */}
-          <div className="col-span-9">
-            <Tabs defaultValue="tables">
-              <TabsList className="mb-4">
-                <TabsTrigger value="tables">Tables</TabsTrigger>
-                <TabsTrigger value="views">Views</TabsTrigger>
-                <TabsTrigger value="procedures">Stored Procedures</TabsTrigger>
-                <TabsTrigger value="functions">Functions</TabsTrigger>
-                <TabsTrigger value="scripts">Scripts</TabsTrigger>
-                <TabsTrigger value="security">Security</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="tables" className="border rounded-md border-carbon-gray-20">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Columns</TableHead>
-                      <TableHead>Rows (Est.)</TableHead>
-                      <TableHead>Last Updated</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {schemaData.tables.map((table) => (
-                      <TableRow key={table.name}>
-                        <TableCell className="font-medium">{table.name}</TableCell>
-                        <TableCell>{table.columns}</TableCell>
-                        <TableCell>{table.rows}</TableCell>
-                        <TableCell>{table.lastUpdated}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-              
-              <TabsContent value="views" className="border rounded-md border-carbon-gray-20">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Base Tables</TableHead>
-                      <TableHead>Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {schemaData.views.map((view) => (
-                      <TableRow key={view.name}>
-                        <TableCell className="font-medium">{view.name}</TableCell>
-                        <TableCell>{view.baseTables}</TableCell>
-                        <TableCell>{view.created}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-              
-              <TabsContent value="procedures" className="border rounded-md border-carbon-gray-20">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Parameters</TableHead>
-                      <TableHead>Last Modified</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {schemaData.procedures.map((proc) => (
-                      <TableRow key={proc.name}>
-                        <TableCell className="font-medium">{proc.name}</TableCell>
-                        <TableCell>{proc.parameters}</TableCell>
-                        <TableCell>{proc.lastModified}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-              
-              <TabsContent value="functions" className="border rounded-md border-carbon-gray-20">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Return Type</TableHead>
-                      <TableHead>Parameters</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {schemaData.functions.map((func) => (
-                      <TableRow key={func.name}>
-                        <TableCell className="font-medium">{func.name}</TableCell>
-                        <TableCell>{func.returnType}</TableCell>
-                        <TableCell>{func.parameters}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-              
-              <TabsContent value="scripts" className="border rounded-md border-carbon-gray-20">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Size</TableHead>
-                      <TableHead>Last Modified</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {schemaData.scripts.map((script) => (
-                      <TableRow key={script.name}>
-                        <TableCell className="font-medium">{script.name}</TableCell>
-                        <TableCell>{script.type}</TableCell>
-                        <TableCell>{script.size}</TableCell>
-                        <TableCell>{script.lastModified}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-              
-              <TabsContent value="security" className="border rounded-md border-carbon-gray-20">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Object</TableHead>
-                      <TableHead>Role</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {schemaData.security.map((item) => (
-                      <TableRow key={item.name}>
-                        <TableCell className="font-medium">{item.name}</TableCell>
-                        <TableCell>{item.type}</TableCell>
-                        <TableCell>{item.object}</TableCell>
-                        <TableCell>{item.role}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-            </Tabs>
+          <div className="flex-1 p-6 bg-white">
+            {renderContent()}
           </div>
         </div>
       </div>

@@ -1,8 +1,10 @@
 
 import { useState } from "react";
-import { Upload, X, File, CheckCircle, AlertTriangle } from "lucide-react";
+import { Upload, X, FileCode, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import { processSqlFile } from "@/services/databaseService";
 
 type FileStatus = "idle" | "uploading" | "success" | "error";
 
@@ -13,6 +15,7 @@ type UploadedFile = {
   type: string;
   status: FileStatus;
   progress: number;
+  content?: string;
   error?: string;
 };
 
@@ -56,61 +59,105 @@ const FileUploader = () => {
       file.type === 'text/plain'
     );
     
+    if (sqlFiles.length === 0) {
+      toast({
+        title: "Invalid files",
+        description: "Please upload SQL, BTEQ, or TXT files only",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const newUploadedFiles = sqlFiles.map(file => ({
       id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: file.name,
       size: file.size,
       type: file.type,
-      status: "idle" as FileStatus,
+      status: "uploading" as FileStatus,
       progress: 0
     }));
     
-    // Simulate file upload process
+    // Add new files to state
     setFiles(prev => [...prev, ...newUploadedFiles]);
     
-    newUploadedFiles.forEach(file => {
-      simulateUpload(file.id);
+    // Process each file
+    sqlFiles.forEach((file, index) => {
+      const fileId = newUploadedFiles[index].id;
+      simulateUpload(file, fileId);
     });
   };
   
-  const simulateUpload = (fileId: string) => {
-    setFiles(prev => 
-      prev.map(f => 
-        f.id === fileId ? { ...f, status: "uploading" } : f
-      )
-    );
-    
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 5;
+  const simulateUpload = async (file: File, fileId: string) => {
+    try {
+      // Update progress in steps to simulate upload
+      const progressInterval = setInterval(() => {
+        setFiles(prev => 
+          prev.map(f => 
+            f.id === fileId 
+              ? { ...f, progress: Math.min(f.progress + 10, 90) } 
+              : f
+          )
+        );
+      }, 200);
       
+      // Process the file using our service
+      const result = await processSqlFile(file);
+      
+      // Clear the progress interval
+      clearInterval(progressInterval);
+      
+      // Update file status based on processing result
       setFiles(prev => 
-        prev.map(f => 
-          f.id === fileId 
-            ? { ...f, progress: Math.min(progress, 100) } 
-            : f
-        )
+        prev.map(f => {
+          if (f.id === fileId) {
+            return { 
+              ...f, 
+              status: result.status as FileStatus,
+              progress: 100,
+              content: result.content,
+              error: result.error
+            };
+          }
+          return f;
+        })
       );
       
-      if (progress >= 100) {
-        clearInterval(interval);
-        
-        setFiles(prev => 
-          prev.map(f => {
-            if (f.id === fileId) {
-              // Randomly simulate success or error for demo
-              const isSuccess = Math.random() > 0.2;
-              return { 
-                ...f, 
-                status: isSuccess ? "success" : "error",
-                error: isSuccess ? undefined : "Invalid SQL syntax detected"
-              };
-            }
-            return f;
-          })
-        );
+      // Show notification
+      if (result.status === 'success') {
+        toast({
+          title: "File processed successfully",
+          description: `${file.name} has been uploaded and processed`,
+        });
+      } else {
+        toast({
+          title: "File processing failed",
+          description: result.error || "An error occurred while processing the file",
+          variant: "destructive",
+        });
       }
-    }, 100);
+    } catch (error) {
+      // Handle errors
+      clearInterval();
+      setFiles(prev => 
+        prev.map(f => {
+          if (f.id === fileId) {
+            return { 
+              ...f, 
+              status: "error",
+              progress: 100,
+              error: "Failed to process file"
+            };
+          }
+          return f;
+        })
+      );
+      
+      toast({
+        title: "Error processing file",
+        description: "An unexpected error occurred while processing the file",
+        variant: "destructive",
+      });
+    }
   };
   
   const removeFile = (fileId: string) => {
@@ -158,7 +205,13 @@ const FileUploader = () => {
                 variant="outline" 
                 className="carbon-button-secondary h-8 text-xs"
                 onClick={() => {
-                  console.log("Processing files:", files.filter(f => f.status === "success"));
+                  toast({
+                    title: "Processing files",
+                    description: `Processing ${files.filter(f => f.status === "success").length} files for conversion`,
+                  });
+                  
+                  // In a real app, this would trigger the conversion process
+                  // using the processed files and database connections
                 }}
               >
                 Process Files
@@ -170,7 +223,7 @@ const FileUploader = () => {
               <li key={file.id} className="flex items-center justify-between p-3">
                 <div className="flex items-center">
                   <div className="w-10 h-10 flex items-center justify-center bg-carbon-gray-10 mr-3">
-                    <File size={20} className="text-carbon-gray-60" />
+                    <FileCode size={20} className="text-carbon-gray-60" />
                   </div>
                   <div>
                     <p className="text-carbon-gray-90 font-medium text-sm">{file.name}</p>
@@ -189,9 +242,10 @@ const FileUploader = () => {
                           style={{ width: `${file.progress}%` }}
                         ></div>
                       </div>
-                      <p className="text-xs text-carbon-gray-60 mt-1 text-right">
-                        {file.progress}%
-                      </p>
+                      <div className="flex items-center justify-end mt-1">
+                        <Loader2 size={12} className="text-carbon-gray-60 animate-spin mr-1" />
+                        <p className="text-xs text-carbon-gray-60">{file.progress}%</p>
+                      </div>
                     </div>
                   )}
                   

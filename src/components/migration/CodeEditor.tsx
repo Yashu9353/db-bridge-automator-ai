@@ -1,8 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, AlertTriangle, X } from "lucide-react";
+import { CheckCircle, AlertTriangle, X, Download, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import { convertSqlSyntax, downloadSqlFile } from "@/services/databaseService";
 
 type EditorProps = {
   sourceCode?: string;
@@ -41,35 +43,87 @@ AND (
       (b2.order_date = b.order_date AND b2.order_id > b.order_id))
 ) = 0;`;
 
-// Simulated syntax errors for demonstration
-const sampleErrors = [
-  {
-    line: 8,
-    message: "Table 'order_db.orders' may require schema qualification in Db2",
-    severity: "warning",
-    solution: "Check if the schema 'order_db' exists in the target database"
-  },
-  {
-    line: 10,
-    message: "QUALIFY is not supported in IBM Db2 syntax",
-    severity: "error",
-    solution: "Use subquery with ROW_NUMBER() function instead"
-  }
-];
-
 const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCode }: EditorProps) => {
   const [source, setSource] = useState(sourceCode);
   const [target, setTarget] = useState(targetCode);
-  const [errors, setErrors] = useState(sampleErrors);
+  const [errors, setErrors] = useState<Array<{
+    line: number;
+    message: string;
+    severity: 'warning' | 'error';
+    solution?: string;
+  }>>([]);
   const [activeTab, setActiveTab] = useState<"source" | "target">("source");
+  const [isConverting, setIsConverting] = useState(false);
+  const [conversionStats, setConversionStats] = useState({
+    successCount: 2,
+    warningCount: 1,
+    errorCount: 1,
+  });
   
   useEffect(() => {
-    // Simulate syntax highlighting by replacing with the actual implementation
-    // In a real app, we would use a library like Prism.js, Monaco Editor, or CodeMirror
-  }, [source, target]);
+    // Initialize with some sample errors
+    setErrors([
+      {
+        line: 8,
+        message: "Table 'order_db.orders' may require schema qualification in Db2",
+        severity: "warning",
+        solution: "Check if the schema 'order_db' exists in the target database"
+      },
+      {
+        line: 10,
+        message: "QUALIFY is not supported in IBM Db2 syntax",
+        severity: "error",
+        solution: "Use subquery with ROW_NUMBER() function instead"
+      }
+    ]);
+  }, []);
   
   const sourceLines = source.split('\n');
   const targetLines = target.split('\n');
+  
+  const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setSource(e.target.value);
+    // In a real app, we would debounce this and send to backend for syntax checking
+  };
+
+  const handleRunConversion = async () => {
+    setIsConverting(true);
+    
+    try {
+      // Call our simulated backend service
+      const result = await convertSqlSyntax(source, 'teradata', 'db2');
+      
+      // Update the state with conversion results
+      setTarget(result.targetCode);
+      setErrors(result.issues);
+      setConversionStats({
+        successCount: result.successCount,
+        warningCount: result.warningCount,
+        errorCount: result.errorCount,
+      });
+      
+      toast({
+        title: "Conversion completed",
+        description: `${result.successCount} SQL statements converted successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Conversion failed",
+        description: "An error occurred during SQL conversion",
+        variant: "destructive",
+      });
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  const handleDownload = () => {
+    downloadSqlFile(target, "converted-db2-script.sql");
+    toast({
+      title: "Download started",
+      description: "Your converted SQL script is being downloaded",
+    });
+  };
   
   return (
     <div className="border border-carbon-gray-20">
@@ -109,48 +163,60 @@ const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCo
               ))}
             </div>
             <div className="p-2 flex-1 font-mono text-sm relative">
-              {sourceLines.map((line, i) => {
-                const lineErrors = errors.filter(e => e.line === i + 1);
-                return (
-                  <div key={i} className="leading-6 relative group">
-                    <div
-                      className={cn(
-                        "whitespace-pre",
-                        lineErrors.length > 0 && (
-                          lineErrors.some(e => e.severity === "error")
-                            ? "bg-red-50"
-                            : "bg-yellow-50"
-                        )
-                      )}
-                    >
-                      {line || ' '}
-                    </div>
-                    {lineErrors.map((error, errorIndex) => (
+              <textarea 
+                className="w-full h-full resize-none border-0 bg-transparent p-0 font-mono text-sm focus:outline-none focus:ring-0"
+                value={source}
+                onChange={handleSourceChange}
+                spellCheck={false}
+                style={{ lineHeight: "1.5rem" }}
+              />
+              
+              {/* Overlay for error indicators */}
+              <div className="absolute top-2 left-2 right-2 bottom-2 pointer-events-none">
+                {errors.map((error, idx) => {
+                  const line = error.line - 1;
+                  if (line >= 0 && line < sourceLines.length) {
+                    return (
                       <div 
-                        key={errorIndex}
-                        className="hidden group-hover:block absolute -right-4 top-0 transform translate-x-full bg-white shadow-lg border border-carbon-gray-20 p-3 z-10 w-64"
+                        key={idx}
+                        className={cn(
+                          "absolute left-0 right-0",
+                          error.severity === "error" ? "bg-red-50" : "bg-yellow-50"
+                        )}
+                        style={{ 
+                          top: `${line * 1.5}rem`, 
+                          height: "1.5rem",
+                          opacity: 0.5
+                        }}
                       >
-                        <div className="flex items-start gap-2">
-                          {error.severity === "error" ? (
-                            <X size={16} className="text-carbon-error mt-0.5" />
-                          ) : (
-                            <AlertTriangle size={16} className="text-carbon-warning mt-0.5" />
-                          )}
-                          <div>
-                            <p className={error.severity === "error" ? "text-carbon-error font-medium" : "text-carbon-warning font-medium"}>
-                              {error.severity === "error" ? "Error" : "Warning"}
-                            </p>
-                            <p className="text-sm text-carbon-gray-70 mt-1">{error.message}</p>
-                            {error.solution && (
-                              <p className="text-sm text-carbon-blue mt-1">Suggestion: {error.solution}</p>
-                            )}
+                        <div className="group relative h-full">
+                          <div 
+                            className="hidden group-hover:block absolute right-0 top-0 transform translate-y-4 z-10 w-64 bg-white shadow-lg border border-carbon-gray-20 p-3"
+                          >
+                            <div className="flex items-start gap-2">
+                              {error.severity === "error" ? (
+                                <X size={16} className="text-carbon-error mt-0.5" />
+                              ) : (
+                                <AlertTriangle size={16} className="text-carbon-warning mt-0.5" />
+                              )}
+                              <div>
+                                <p className={error.severity === "error" ? "text-carbon-error font-medium" : "text-carbon-warning font-medium"}>
+                                  {error.severity === "error" ? "Error" : "Warning"}
+                                </p>
+                                <p className="text-sm text-carbon-gray-70 mt-1">{error.message}</p>
+                                {error.solution && (
+                                  <p className="text-sm text-carbon-blue mt-1">Suggestion: {error.solution}</p>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                );
-              })}
+                    );
+                  }
+                  return null;
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -165,11 +231,7 @@ const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCo
               ))}
             </div>
             <div className="p-2 flex-1 font-mono text-sm">
-              {targetLines.map((line, i) => (
-                <div key={i} className="leading-6 whitespace-pre">
-                  {line || ' '}
-                </div>
-              ))}
+              <pre className="whitespace-pre-wrap">{target}</pre>
             </div>
           </div>
         </div>
@@ -179,34 +241,41 @@ const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCo
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-carbon-success" />
-            <span className="text-sm">2 successful conversions</span>
+            <span className="text-sm">{conversionStats.successCount} successful conversions</span>
           </div>
-          <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="text-carbon-warning" />
-            <span className="text-sm">1 warning</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <X size={16} className="text-carbon-error" />
-            <span className="text-sm">1 error</span>
-          </div>
+          {conversionStats.warningCount > 0 && (
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={16} className="text-carbon-warning" />
+              <span className="text-sm">{conversionStats.warningCount} warning{conversionStats.warningCount !== 1 ? 's' : ''}</span>
+            </div>
+          )}
+          {conversionStats.errorCount > 0 && (
+            <div className="flex items-center gap-2">
+              <X size={16} className="text-carbon-error" />
+              <span className="text-sm">{conversionStats.errorCount} error{conversionStats.errorCount !== 1 ? 's' : ''}</span>
+            </div>
+          )}
         </div>
         <div>
           <Button 
             type="button" 
             className="carbon-button-primary mr-2"
-            onClick={() => {
-              console.log("Running conversion");
-            }}
+            disabled={isConverting}
+            onClick={handleRunConversion}
           >
-            Run Conversion
+            {isConverting ? (
+              <>
+                <Loader2 size={16} className="mr-2 animate-spin" />
+                Converting...
+              </>
+            ) : "Run Conversion"}
           </Button>
           <Button 
             type="button" 
             className="carbon-button-secondary"
-            onClick={() => {
-              console.log("Downloading target code");
-            }}
+            onClick={handleDownload}
           >
+            <Download size={16} className="mr-2" />
             Download Result
           </Button>
         </div>

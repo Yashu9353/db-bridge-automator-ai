@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, X, AlertCircle } from "lucide-react";
+import { CheckCircle, X, AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { testDatabaseConnection, DatabaseType } from "@/services/databaseService";
 
 type ConnectionStatus = "idle" | "testing" | "success" | "error";
 
@@ -15,6 +17,7 @@ type ConnectionFormProps = {
 
 const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     databaseType: type === "source" ? "teradata" : "db2",
     host: "",
@@ -27,21 +30,52 @@ const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
   
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Reset connection status when form changes
+    if (connectionStatus !== "idle") {
+      setConnectionStatus("idle");
+      setErrorMessage(null);
+    }
   };
   
-  const handleTestConnection = () => {
+  const handleTestConnection = async () => {
     setConnectionStatus("testing");
+    setErrorMessage(null);
     
-    // Simulate connection test with timeout
-    setTimeout(() => {
-      // For demo purpose: success for target, random for source
-      if (type === "target") {
+    try {
+      const result = await testDatabaseConnection(type, {
+        databaseType: formData.databaseType as DatabaseType,
+        host: formData.host,
+        port: formData.port,
+        database: formData.database,
+        username: formData.username,
+        password: formData.password
+      });
+      
+      if (result.success) {
         setConnectionStatus("success");
+        toast({
+          title: "Connection successful",
+          description: `Connected to ${formData.database}`,
+          variant: "default",
+        });
       } else {
-        const success = Math.random() > 0.3;
-        setConnectionStatus(success ? "success" : "error");
+        setConnectionStatus("error");
+        setErrorMessage(result.message || "Connection failed. Please check your settings.");
+        toast({
+          title: "Connection failed",
+          description: result.message,
+          variant: "destructive",
+        });
       }
-    }, 1500);
+    } catch (error) {
+      setConnectionStatus("error");
+      setErrorMessage("An unexpected error occurred");
+      toast({
+        title: "Connection error",
+        description: "An unexpected error occurred while testing the connection",
+        variant: "destructive",
+      });
+    }
   };
   
   return (
@@ -146,7 +180,12 @@ const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
                 : "carbon-button-secondary"
             }
           >
-            {connectionStatus === "testing" ? "Testing..." : "Test Connection"}
+            {connectionStatus === "testing" ? (
+              <>
+                <Loader2 size={16} className="mr-2 animate-spin" />
+                Testing...
+              </>
+            ) : "Test Connection"}
           </Button>
           
           {connectionStatus === "success" && (
@@ -164,12 +203,12 @@ const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
           )}
         </div>
         
-        {connectionStatus === "error" && (
+        {connectionStatus === "error" && errorMessage && (
           <div className="bg-red-50 border border-carbon-error p-3 flex items-start gap-3">
             <AlertCircle size={16} className="text-carbon-error mt-1" />
             <div>
               <p className="text-carbon-error font-medium">Connection Error</p>
-              <p className="text-sm mt-1">Unable to connect to the database. Please verify your connection details and ensure the database is accessible from your network.</p>
+              <p className="text-sm mt-1">{errorMessage}</p>
             </div>
           </div>
         )}
