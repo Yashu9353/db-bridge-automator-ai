@@ -88,9 +88,11 @@ const FileUploader = () => {
   };
   
   const simulateUpload = async (file: File, fileId: string) => {
+    let progressInterval: number | undefined;
+    
     try {
       // Update progress in steps to simulate upload
-      const progressInterval = setInterval(() => {
+      progressInterval = window.setInterval(() => {
         setFiles(prev => 
           prev.map(f => 
             f.id === fileId 
@@ -104,7 +106,9 @@ const FileUploader = () => {
       const result = await processSqlFile(file);
       
       // Clear the progress interval
-      clearInterval(progressInterval);
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
       
       // Update file status based on processing result
       setFiles(prev => 
@@ -137,7 +141,10 @@ const FileUploader = () => {
       }
     } catch (error) {
       // Handle errors
-      clearInterval();
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+      
       setFiles(prev => 
         prev.map(f => {
           if (f.id === fileId) {
