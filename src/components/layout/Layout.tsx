@@ -67,10 +67,12 @@ const Layout = ({ children }: LayoutProps) => {
                   <Logout size={20} />
                 </HeaderGlobalAction>
               </HeaderGlobalBar>
+              {/* Using the proper SideNav pattern from Carbon */}
               <SideNav
                 aria-label="Side navigation"
-                expanded={isSideNavExpanded}
                 isRail
+                expanded={isSideNavExpanded}
+                isPersistent={false}
               >
                 <SideNavItems>
                   <SideNavLink renderIcon={Home} href="/">
