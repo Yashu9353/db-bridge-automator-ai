@@ -1,16 +1,9 @@
 
 @use '@carbon/react/scss/themes';
-@use '@carbon/react/scss/theme' with (
-  $theme: themes.$g100
-);
-
-@use '@carbon/react/scss/components/button/tokens' as button-tokens;
-@use '@carbon/react/scss/components/text-input/tokens' as text-input-tokens;
-@use '@carbon/react/scss/components/dropdown/tokens' as dropdown-tokens;
 @use '@carbon/react';
 
 :root {
-  @include carbon-react.theme();
+  @include carbon-react.theme(themes.$g100);
 }
 
 // IBM Carbon Design System specific element styling
@@ -21,7 +14,7 @@ body {
 }
 
 .cds-carbon-theme {
-  @include carbon-react.theme();
+  @include carbon-react.theme(themes.$g100);
 }
 
 // Override any custom elements to ensure Carbon Design System consistency
