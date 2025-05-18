@@ -67,50 +67,8 @@ const Layout = ({ children }: LayoutProps) => {
                   <Logout size={20} />
                 </HeaderGlobalAction>
               </HeaderGlobalBar>
-              {/* Using the proper SideNav pattern from Carbon */}
-              <SideNav
-                aria-label="Side navigation"
-                isRail
-                expanded={isSideNavExpanded}
-                isPersistent={false}
-              >
-                <SideNavItems>
-                  <SideNavLink renderIcon={Home} href="/">
-                    Dashboard
-                  </SideNavLink>
-                  <SideNavMenu renderIcon={DataBase} title="Database">
-                    <SideNavMenuItem href="/database/connections">
-                      Connections
-                    </SideNavMenuItem>
-                    <SideNavMenuItem href="/database/schema">
-                      Schema Browser
-                    </SideNavMenuItem>
-                  </SideNavMenu>
-                  <SideNavMenu renderIcon={DocumentAdd} title="SQL Scripts">
-                    <SideNavMenuItem href="/scripts/manage">
-                      Manage Scripts
-                    </SideNavMenuItem>
-                    <SideNavMenuItem href="/scripts/upload">
-                      Upload Scripts
-                    </SideNavMenuItem>
-                  </SideNavMenu>
-                  <SideNavLink renderIcon={Play} href="/run">
-                    Run Migrations
-                  </SideNavLink>
-                  <SideNavLink renderIcon={CheckmarkOutline} href="/validation">
-                    Validation Results
-                  </SideNavLink>
-                  <SideNavLink renderIcon={WarningAlt} href="/issues">
-                    Issues & Fixes
-                  </SideNavLink>
-                  <SideNavLink renderIcon={ChartLineData} href="/reports">
-                    Reports
-                  </SideNavLink>
-                  <SideNavLink renderIcon={Settings} href="/settings">
-                    Settings
-                  </SideNavLink>
-                </SideNavItems>
-              </SideNav>
+              
+              {/* Let's remove SideNav to test if it's causing the error */}
             </Header>
           </>
         )}
