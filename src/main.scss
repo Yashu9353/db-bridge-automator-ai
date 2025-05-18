@@ -1,0 +1,104 @@
+
+// Import Carbon component styles
+@use '@carbon/react';
+
+// Carbon theme styles
+@import './carbon-theme.scss';
+
+// IBM Plex fonts
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+// Custom Carbon spacing utility classes
+.mb-01 {
+  margin-bottom: $spacing-01;
+}
+.mb-02 {
+  margin-bottom: $spacing-02;
+}
+.mb-03 {
+  margin-bottom: $spacing-03;
+}
+.mb-04 {
+  margin-bottom: $spacing-04;
+}
+.mb-05 {
+  margin-bottom: $spacing-05;
+}
+.mb-06 {
+  margin-bottom: $spacing-06;
+}
+.mb-07 {
+  margin-bottom: $spacing-07;
+}
+.mb-08 {
+  margin-bottom: $spacing-08;
+}
+.mb-09 {
+  margin-bottom: $spacing-09;
+}
+
+.mt-01 {
+  margin-top: $spacing-01;
+}
+.mt-02 {
+  margin-top: $spacing-02;
+}
+.mt-03 {
+  margin-top: $spacing-03;
+}
+.mt-04 {
+  margin-top: $spacing-04;
+}
+.mt-05 {
+  margin-top: $spacing-05;
+}
+.mt-06 {
+  margin-top: $spacing-06;
+}
+.mt-07 {
+  margin-top: $spacing-07;
+}
+.mt-08 {
+  margin-top: $spacing-08;
+}
+.mt-09 {
+  margin-top: $spacing-09;
+}
+
+// Use Carbon's productive type scale
+.text-productive-heading-01 {
+  @include carbon-react.productive-heading-01;
+}
+.text-productive-heading-02 {
+  @include carbon-react.productive-heading-02;
+}
+.text-productive-heading-03 {
+  @include carbon-react.productive-heading-03;
+}
+.text-productive-heading-04 {
+  @include carbon-react.productive-heading-04;
+}
+.text-productive-heading-05 {
+  @include carbon-react.productive-heading-05;
+}
+.text-productive-heading-06 {
+  @include carbon-react.productive-heading-06;
+}
+.text-productive-heading-07 {
+  @include carbon-react.productive-heading-07;
+}
+
+.text-body-short-01 {
+  @include carbon-react.body-short-01;
+}
+.text-body-short-02 {
+  @include carbon-react.body-short-02;
+}
+.text-body-long-01 {
+  @include carbon-react.body-long-01;
+}
+.text-body-long-02 {
+  @include carbon-react.body-long-02;
+}
+
+// Update main.tsx to import main.scss

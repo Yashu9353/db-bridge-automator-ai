@@ -1,12 +1,28 @@
 
 import { useState, useEffect } from "react";
-import Layout from "@/components/layout/Layout";
-import CodeEditor from "@/components/migration/CodeEditor";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Download, AlertTriangle, CheckCircle, Loader2, Info } from "lucide-react";
+import {
+  Content,
+  Grid,
+  Column,
+  Tabs,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Button,
+  InlineNotification
+} from "@carbon/react";
+import {
+  ArrowRight,
+  Download,
+  WarningAlt,
+  CheckmarkFilled,
+  Information
+} from "@carbon/icons-react";
 import { toast } from "sonner";
 import { downloadSqlFile, convertSqlSyntax } from "@/services/databaseService";
+import CodeEditor from "@/components/migration/CodeEditor";
+import PageHeader from "@/components/layout/PageHeader";
 
 const ConversionEditor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -139,126 +155,109 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY a.customer_id ORDER BY b.order_date DESC
   };
   
   return (
-    <Layout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-medium text-carbon-gray-100">SQL Conversion</h1>
-            <p className="text-carbon-gray-70 mt-1">
-              {selectedScript 
+    <Content>
+      <Grid fullWidth>
+        <Column lg={16} md={8} sm={4}>
+          <div className="space-y-6">
+            <PageHeader 
+              title="SQL Conversion"
+              description={selectedScript 
                 ? `Converting: ${selectedScript.name}`
-                : "View and edit your converted SQL code"}
-            </p>
-          </div>
-          
-          <div className="flex gap-3">
-            <Button 
-              className="carbon-button-secondary"
-              disabled={!convertedCode}
-              onClick={handleDownload}
-            >
-              <Download size={16} className="mr-2" />
-              Download Scripts
-            </Button>
-            
-            <Button 
-              className="carbon-button-primary"
-              disabled={isProcessing || !sourceCode}
-              onClick={handleRunMigration}
-            >
-              {isProcessing ? (
+                : "View and edit your converted SQL code"
+              }
+              actions={
                 <>
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                  Processing...
+                  <Button
+                    kind="secondary"
+                    renderIcon={Download}
+                    disabled={!convertedCode}
+                    onClick={handleDownload}
+                  >
+                    Download Scripts
+                  </Button>
+                  
+                  <Button
+                    renderIcon={ArrowRight}
+                    disabled={isProcessing || !sourceCode}
+                    onClick={handleRunMigration}
+                  >
+                    {isProcessing ? "Processing..." : "Run Migration"}
+                  </Button>
                 </>
-              ) : (
-                <>
-                  Run Migration
-                  <ArrowRight size={16} className="ml-2" />
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-        
-        {selectedScript?.sqlType === 'teradata' && (
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 flex items-start gap-3">
-            <Info size={20} className="text-blue-500 mt-0.5" />
-            <div>
-              <h3 className="font-medium text-gray-800">Teradata SQL Detected</h3>
-              <p className="text-gray-600 mt-1">
-                This script has been identified as Teradata SQL. The parser will convert Teradata-specific 
-                syntax to IBM Db2 compatible SQL.
-              </p>
-            </div>
-          </div>
-        )}
-        
-        <Tabs defaultValue="editor">
-          <TabsList className="carbon-tabs border-none">
-            <TabsTrigger value="editor" className="carbon-tab-selected">
-              Code Editor
-            </TabsTrigger>
-            <TabsTrigger value="issues" className="carbon-tab-unselected">
-              Issues & Feedback
-            </TabsTrigger>
-            <TabsTrigger value="visual" className="carbon-tab-unselected">
-              Visual Comparison
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="editor" className="pt-4">
-            <CodeEditor 
-              sourceCode={sourceCode} 
-              targetCode={convertedCode}
-              errors={conversionIssues}
-              onSourceChange={setSourceCode}
+              }
             />
-          </TabsContent>
-          
-          <TabsContent value="issues" className="pt-4">
-            <div className="border border-carbon-gray-20">
-              <div className="border-b border-carbon-gray-20 bg-carbon-gray-10 px-4 py-3">
-                <h3 className="font-medium">Conversion Issues</h3>
-              </div>
-              <div className="divide-y divide-carbon-gray-20">
-                {conversionIssues.map((issue, index) => (
-                  <div key={index} className="p-4">
-                    <div className="flex items-start">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 mr-2 ${
-                        issue.severity === 'error' ? 'bg-carbon-error' : 'bg-carbon-warning'
-                      }`}></div>
-                      <div>
-                        <p className="font-medium">
-                          {issue.severity === 'error' ? 'Error' : 'Warning'} at line {issue.line}
-                        </p>
-                        <p className="text-carbon-gray-70 mt-1">{issue.message}</p>
-                        {issue.solution && (
-                          <p className="text-carbon-blue mt-1 text-sm">
-                            Suggested solution: {issue.solution}
-                          </p>
-                        )}
-                      </div>
+            
+            {selectedScript?.sqlType === 'teradata' && (
+              <InlineNotification
+                kind="info"
+                title="Teradata SQL Detected"
+                subtitle="This script has been identified as Teradata SQL. The parser will convert Teradata-specific syntax to IBM Db2 compatible SQL."
+                lowContrast
+                hideCloseButton
+              />
+            )}
+            
+            <Tabs>
+              <TabList aria-label="SQL Conversion Tabs">
+                <Tab>Code Editor</Tab>
+                <Tab>Issues & Feedback</Tab>
+                <Tab>Visual Comparison</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <CodeEditor 
+                    sourceCode={sourceCode} 
+                    targetCode={convertedCode}
+                    errors={conversionIssues}
+                    onSourceChange={setSourceCode}
+                  />
+                </TabPanel>
+                
+                <TabPanel>
+                  <div className="border border-gray-100">
+                    <div className="border-b p-4 bg-gray-10">
+                      <h3 className="font-medium">Conversion Issues</h3>
+                    </div>
+                    <div>
+                      {conversionIssues.map((issue, index) => (
+                        <div key={index} className="p-4 border-b">
+                          <div className="flex items-start">
+                            {issue.severity === 'error' ? (
+                              <WarningAlt className="mt-1 mr-2 fill-red-60" />
+                            ) : (
+                              <Information className="mt-1 mr-2 fill-yellow-30" />
+                            )}
+                            <div>
+                              <p className="font-medium">
+                                {issue.severity === 'error' ? 'Error' : 'Warning'} at line {issue.line}
+                              </p>
+                              <p className="text-gray-70 mt-1">{issue.message}</p>
+                              {issue.solution && (
+                                <p className="text-blue-60 mt-1 text-sm">
+                                  Suggested solution: {issue.solution}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                      {(!conversionIssues || conversionIssues.length === 0) && (
+                        <div className="p-6 text-center text-gray-70">
+                          <p>No issues found in your SQL conversion</p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
-
-                {(!conversionIssues || conversionIssues.length === 0) && (
-                  <div className="p-6 text-center text-carbon-gray-70">
-                    <p>No issues found in your SQL conversion</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="visual" className="pt-4">
-            <div className="border border-carbon-gray-20 p-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-medium mb-3">Teradata (Source)</h3>
-                  <div className="border border-carbon-gray-20 p-3 bg-carbon-gray-10 font-mono text-sm whitespace-pre-line">
-                    {sourceCode || `SELECT 
+                </TabPanel>
+                
+                <TabPanel>
+                  <div className="border p-6">
+                    <Grid condensed>
+                      <Column lg={8} md={4} sm={4}>
+                        <h3 className="font-medium mb-3">Teradata (Source)</h3>
+                        <div className="border p-3 bg-gray-10 font-mono text-sm whitespace-pre-line">
+                          {sourceCode || `SELECT 
   a.customer_id,
   a.customer_name,
   b.order_id,
@@ -269,12 +268,12 @@ INNER JOIN order_db.orders b
 ON a.customer_id = b.customer_id
 WHERE b.order_date BETWEEN DATE '2023-01-01' AND DATE '2023-12-31'
 QUALIFY ROW_NUMBER() OVER (PARTITION BY a.customer_id ORDER BY b.order_date DESC) = 1;`}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-3">IBM Db2 (Target)</h3>
-                  <div className="border border-carbon-gray-20 p-3 bg-carbon-gray-10 font-mono text-sm whitespace-pre-line">
-                    {convertedCode || `SELECT 
+                        </div>
+                      </Column>
+                      <Column lg={8} md={4} sm={4}>
+                        <h3 className="font-medium mb-3">IBM Db2 (Target)</h3>
+                        <div className="border p-3 bg-gray-10 font-mono text-sm whitespace-pre-line">
+                          {convertedCode || `SELECT 
   a.customer_id,
   a.customer_name,
   b.order_id,
@@ -291,23 +290,26 @@ AND (
   AND (b2.order_date {'>'} b.order_date OR 
       (b2.order_date = b.order_date AND b2.order_id {'>'} b.order_id))
 ) = 0;`}
-                  </div>
-                </div>
-              </div>
+                        </div>
+                      </Column>
+                    </Grid>
 
-              <div className="mt-6">
-                <h3 className="font-medium mb-3">Key Differences</h3>
-                <ul className="list-disc list-inside space-y-2 text-carbon-gray-80">
-                  <li>DATE literal syntax changed from <code>DATE '2023-01-01'</code> to <code>DATE('2023-01-01')</code></li>
-                  <li>QUALIFY with ROW_NUMBER() replaced with equivalent subquery logic</li>
-                  <li>Table schema references maintained for compatibility</li>
-                </ul>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </Layout>
+                    <div className="mt-6">
+                      <h3 className="font-medium mb-3">Key Differences</h3>
+                      <ul className="list-disc list-inside space-y-2 text-gray-80">
+                        <li>DATE literal syntax changed from <code>DATE '2023-01-01'</code> to <code>DATE('2023-01-01')</code></li>
+                        <li>QUALIFY with ROW_NUMBER() replaced with equivalent subquery logic</li>
+                        <li>Table schema references maintained for compatibility</li>
+                      </ul>
+                    </div>
+                  </div>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </div>
+        </Column>
+      </Grid>
+    </Content>
   );
 };
 
