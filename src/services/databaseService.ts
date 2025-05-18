@@ -33,10 +33,59 @@ interface ConversionResult {
   errorCount: number;
 }
 
+// Simulated connections storage
+const connections: {
+  source?: DatabaseConnection;
+  target?: DatabaseConnection;
+} = {};
+
+// Function to get stored database connections
+export const getDatabaseConnections = () => {
+  return connections;
+};
+
+// Simulated function to fetch database schema
+export const fetchDatabaseSchema = async (connectionId: string) => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Mock schema data for demonstration
+  return {
+    schemas: [
+      {
+        name: "SALES",
+        tables: [
+          { name: "CUSTOMERS", columns: ["CUSTOMER_ID", "NAME", "EMAIL", "ADDRESS"] },
+          { name: "ORDERS", columns: ["ORDER_ID", "CUSTOMER_ID", "ORDER_DATE", "AMOUNT"] },
+        ],
+        views: [
+          { name: "CUSTOMER_ORDERS", definition: "SELECT c.NAME, o.ORDER_ID, o.AMOUNT FROM CUSTOMERS c JOIN ORDERS o ON c.CUSTOMER_ID = o.CUSTOMER_ID" }
+        ],
+        procedures: [
+          { name: "GET_CUSTOMER_ORDERS", parameters: ["IN CUSTOMER_ID INTEGER", "OUT RESULT CURSOR"] }
+        ],
+        functions: [
+          { name: "CALCULATE_DISCOUNT", parameters: ["AMOUNT DECIMAL", "CUSTOMER_LEVEL INTEGER"], returnType: "DECIMAL" }
+        ]
+      },
+      {
+        name: "INVENTORY",
+        tables: [
+          { name: "PRODUCTS", columns: ["PRODUCT_ID", "NAME", "PRICE", "QUANTITY"] },
+          { name: "SUPPLIERS", columns: ["SUPPLIER_ID", "NAME", "CONTACT"] }
+        ],
+        views: [],
+        procedures: [],
+        functions: []
+      }
+    ]
+  };
+};
+
 // Simulated function to test a database connection
 export const testDatabaseConnection = async (
   connectionType: 'source' | 'target', 
-  connection: Partial<DatabaseConnection>
+  connection: Partial<DatabaseConnection> & { type: DatabaseType }
 ): Promise<ConnectionResult> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1500));
@@ -53,14 +102,14 @@ export const testDatabaseConnection = async (
   }
   
   // For demo purposes, let's say Teradata connections to localhost:1025 always work
-  if (connection.databaseType === 'teradata' && connection.host === 'localhost' && connection.port === '1025') {
+  if (connection.type === 'teradata' && connection.host === 'localhost' && connection.port === '1025') {
     return {
       success: true
     };
   }
   
   // For demo purposes, let's say DB2 connections to localhost:50000 always work
-  if (connection.databaseType?.startsWith('db2') && connection.host === 'localhost' && connection.port === '50000') {
+  if (connection.type?.startsWith('db2') && connection.host === 'localhost' && connection.port === '50000') {
     return {
       success: true
     };
@@ -82,7 +131,7 @@ export const testDatabaseConnection = async (
 // Simulated function to convert SQL syntax between dialects
 export const convertSqlSyntax = async (
   sourceCode: string,
-  sourceType: 'teradata' | 'other',
+  sourceType: DatabaseType,
   targetType: 'db2'
 ): Promise<ConversionResult> => {
   // Simulate API call delay

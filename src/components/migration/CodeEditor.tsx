@@ -105,7 +105,8 @@ const CodeEditor = ({
                 className="w-full h-full resize-none border-0 p-2 font-mono text-sm"
                 value={source}
                 onChange={handleSourceChange}
-                aria-label="Source SQL code"
+                labelText="Source SQL code"
+                hideLabel
                 style={{ fontFamily: 'IBM Plex Mono, monospace' }}
               />
               
@@ -169,7 +170,8 @@ const CodeEditor = ({
                 className="w-full h-full resize-none border-0 p-2 font-mono text-sm"
                 value={target}
                 readOnly
-                aria-label="Converted SQL code"
+                labelText="Converted SQL code"
+                hideLabel
                 style={{ fontFamily: 'IBM Plex Mono, monospace' }}
               />
             </Column>

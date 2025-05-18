@@ -6,12 +6,12 @@ import {
   Select,
   SelectItem,
   Button,
-  InlineLoading,
   InlineNotification,
   FormGroup,
   Dropdown,
   Grid,
-  Column
+  Column,
+  Loading
 } from "@carbon/react";
 import { testDatabaseConnection, DatabaseType } from "@/services/databaseService";
 
@@ -26,7 +26,7 @@ const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    databaseType: type === "source" ? "teradata" : "db2",
+    type: type === "source" ? "teradata" as DatabaseType : "db2" as DatabaseType,
     host: "",
     port: type === "source" ? "1025" : "50000",
     database: "",
@@ -50,7 +50,7 @@ const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
     
     try {
       const result = await testDatabaseConnection(type, {
-        databaseType: formData.databaseType as DatabaseType,
+        type: formData.type,
         host: formData.host,
         port: formData.port,
         database: formData.database,
@@ -97,9 +97,9 @@ const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
                 label="Select database type"
                 items={databaseOptions}
                 itemToString={(item) => (item ? item.text : '')}
-                selectedItem={databaseOptions.find(item => item.id === formData.databaseType)}
+                selectedItem={databaseOptions.find(item => item.id === formData.type)}
                 onChange={({ selectedItem }) => 
-                  handleInputChange("databaseType", selectedItem?.id || '')
+                  handleInputChange("type", selectedItem?.id as DatabaseType || formData.type)
                 }
               />
             </FormGroup>
@@ -164,7 +164,10 @@ const DatabaseConnector = ({ type, title }: ConnectionFormProps) => {
             className="mr-2"
           >
             {connectionStatus === "testing" ? (
-              <InlineLoading description="Testing..." />
+              <div className="flex items-center">
+                <Loading small description="Testing..." withOverlay={false} />
+                <span className="ml-2">Testing...</span>
+              </div>
             ) : "Test Connection"}
           </Button>
           

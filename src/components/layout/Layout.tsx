@@ -70,7 +70,6 @@ const Layout = ({ children }: LayoutProps) => {
               <SideNav
                 aria-label="Side navigation"
                 expanded={isSideNavExpanded}
-                isPersistent={false}
               >
                 <SideNavItems>
                   <SideNavLink renderIcon={Home} href="/">
