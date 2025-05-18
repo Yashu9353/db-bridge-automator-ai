@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Upload, X, FileCode, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ type UploadedFile = {
   status: FileStatus;
   progress: number;
   content?: string;
+  sqlType?: "teradata" | "db2" | "other";
   error?: string;
 };
 
@@ -74,7 +74,8 @@ const FileUploader = () => {
       size: file.size,
       type: file.type,
       status: "uploading" as FileStatus,
-      progress: 0
+      progress: 0,
+      sqlType: detectSqlType(file.name)
     }));
     
     // Add new files to state
@@ -85,6 +86,16 @@ const FileUploader = () => {
       const fileId = newUploadedFiles[index].id;
       simulateUpload(file, fileId);
     });
+  };
+  
+  const detectSqlType = (fileName: string): "teradata" | "db2" | "other" => {
+    const lowerName = fileName.toLowerCase();
+    if (lowerName.includes('teradata') || lowerName.includes('tera') || lowerName.endsWith('.bteq')) {
+      return "teradata";
+    } else if (lowerName.includes('db2') || lowerName.includes('ibm')) {
+      return "db2";
+    }
+    return "other"; // Default will be treated as Teradata for conversion demo
   };
   
   const simulateUpload = async (file: File, fileId: string) => {
@@ -109,6 +120,11 @@ const FileUploader = () => {
       if (progressInterval) {
         clearInterval(progressInterval);
       }
+
+      // Detect SQL type from content
+      const sqlType = result.content?.toLowerCase().includes('sel ') || 
+                     result.content?.toLowerCase().includes('qualify') ? 
+                     "teradata" : "other";
       
       // Update file status based on processing result
       setFiles(prev => 
@@ -119,6 +135,7 @@ const FileUploader = () => {
               status: result.status as FileStatus,
               progress: 100,
               content: result.content,
+              sqlType,
               error: result.error
             };
           }
@@ -126,11 +143,25 @@ const FileUploader = () => {
         })
       );
       
+      // Store processed file in sessionStorage for access in other components
+      if (result.status === 'success' && result.content) {
+        const scriptsInStorage = JSON.parse(sessionStorage.getItem('uploadedScripts') || '[]');
+        sessionStorage.setItem('uploadedScripts', JSON.stringify([
+          ...scriptsInStorage,
+          {
+            id: fileId,
+            name: file.name,
+            content: result.content,
+            sqlType
+          }
+        ]));
+      }
+      
       // Show notification
       if (result.status === 'success') {
         toast({
           title: "File processed successfully",
-          description: `${file.name} has been uploaded and processed`,
+          description: `${file.name} has been uploaded and processed as ${sqlType === 'teradata' ? 'Teradata' : 'Standard'} SQL`,
         });
       } else {
         toast({
@@ -169,6 +200,12 @@ const FileUploader = () => {
   
   const removeFile = (fileId: string) => {
     setFiles(prev => prev.filter(f => f.id !== fileId));
+    
+    // Also remove from session storage
+    const scriptsInStorage = JSON.parse(sessionStorage.getItem('uploadedScripts') || '[]');
+    sessionStorage.setItem('uploadedScripts', JSON.stringify(
+      scriptsInStorage.filter((script: any) => script.id !== fileId)
+    ));
   };
   
   return (
@@ -180,16 +217,36 @@ const FileUploader = () => {
             ? "border-carbon-blue bg-carbon-blue bg-opacity-5" 
             : "border-carbon-gray-30 hover:border-carbon-blue hover:bg-carbon-blue hover:bg-opacity-5"
         )}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(false);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsDragging(false);
+          
+          const droppedFiles = Array.from(e.dataTransfer.files);
+          processFiles(droppedFiles);
+        }}
         onClick={() => document.getElementById("file-input")?.click()}
       >
         <input 
           id="file-input" 
           type="file" 
           className="hidden" 
-          onChange={handleFileInput}
+          onChange={(e) => {
+            if (e.target.files) {
+              const selectedFiles = Array.from(e.target.files);
+              processFiles(selectedFiles);
+            }
+          }}
           multiple
           accept=".sql,.bteq,.txt,text/plain"
         />
@@ -212,16 +269,17 @@ const FileUploader = () => {
                 variant="outline" 
                 className="carbon-button-secondary h-8 text-xs"
                 onClick={() => {
+                  const successfulFiles = files.filter(f => f.status === "success");
                   toast({
                     title: "Processing files",
-                    description: `Processing ${files.filter(f => f.status === "success").length} files for conversion`,
+                    description: `Processing ${successfulFiles.length} files for conversion`,
                   });
                   
-                  // In a real app, this would trigger the conversion process
-                  // using the processed files and database connections
+                  // Navigate to database connections after uploading
+                  window.location.href = "/database/connections";
                 }}
               >
-                Process Files
+                Continue to Database Connections
               </Button>
             )}
           </div>
@@ -233,7 +291,21 @@ const FileUploader = () => {
                     <FileCode size={20} className="text-carbon-gray-60" />
                   </div>
                   <div>
-                    <p className="text-carbon-gray-90 font-medium text-sm">{file.name}</p>
+                    <p className="text-carbon-gray-90 font-medium text-sm">
+                      {file.name}
+                      {file.sqlType && (
+                        <span className={`ml-2 text-xs px-2 py-0.5 rounded ${
+                          file.sqlType === 'teradata' 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : file.sqlType === 'db2' 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {file.sqlType === 'teradata' ? 'Teradata' : 
+                           file.sqlType === 'db2' ? 'DB2' : 'SQL'}
+                        </span>
+                      )}
+                    </p>
                     <p className="text-carbon-gray-60 text-xs">
                       {Math.round(file.size / 1024)} KB
                     </p>

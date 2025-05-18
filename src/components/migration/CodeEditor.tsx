@@ -9,89 +9,73 @@ import { convertSqlSyntax, downloadSqlFile } from "@/services/databaseService";
 type EditorProps = {
   sourceCode?: string;
   targetCode?: string;
-};
-
-const sampleSourceCode = `-- Teradata sample query
-SELECT 
-  a.customer_id,
-  a.customer_name,
-  b.order_id,
-  b.order_date,
-  b.order_amount
-FROM customer_db.customers a
-INNER JOIN order_db.orders b
-ON a.customer_id = b.customer_id
-WHERE b.order_date BETWEEN DATE '2023-01-01' AND DATE '2023-12-31'
-QUALIFY ROW_NUMBER() OVER (PARTITION BY a.customer_id ORDER BY b.order_date DESC) = 1;`;
-
-const sampleTargetCode = `-- IBM Db2 converted query
-SELECT 
-  a.customer_id,
-  a.customer_name,
-  b.order_id,
-  b.order_date,
-  b.order_amount
-FROM customer_db.customers a
-INNER JOIN order_db.orders b
-ON a.customer_id = b.customer_id
-WHERE b.order_date BETWEEN DATE('2023-01-01') AND DATE('2023-12-31')
-AND (
-  SELECT COUNT(*) 
-  FROM order_db.orders b2 
-  WHERE b2.customer_id = a.customer_id 
-  AND (b2.order_date > b.order_date OR 
-      (b2.order_date = b.order_date AND b2.order_id > b.order_id))
-) = 0;`;
-
-const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCode }: EditorProps) => {
-  const [source, setSource] = useState(sourceCode);
-  const [target, setTarget] = useState(targetCode);
-  const [errors, setErrors] = useState<Array<{
+  errors?: Array<{
     line: number;
     message: string;
     severity: 'warning' | 'error';
     solution?: string;
-  }>>([]);
+  }>;
+  onSourceChange?: (code: string) => void;
+};
+
+const CodeEditor = ({ 
+  sourceCode: initialSourceCode = "", 
+  targetCode: initialTargetCode = "", 
+  errors: initialErrors = [],
+  onSourceChange 
+}: EditorProps) => {
+  const [source, setSource] = useState(initialSourceCode);
+  const [target, setTarget] = useState(initialTargetCode);
+  const [errors, setErrors] = useState(initialErrors);
   const [activeTab, setActiveTab] = useState<"source" | "target">("source");
   const [isConverting, setIsConverting] = useState(false);
   const [conversionStats, setConversionStats] = useState({
-    successCount: 2,
-    warningCount: 1,
-    errorCount: 1,
+    successCount: 0,
+    warningCount: 0,
+    errorCount: 0,
   });
   
+  // Update state when props change
   useEffect(() => {
-    // Initialize with some sample errors
-    setErrors([
-      {
-        line: 8,
-        message: "Table 'order_db.orders' may require schema qualification in Db2",
-        severity: "warning",
-        solution: "Check if the schema 'order_db' exists in the target database"
-      },
-      {
-        line: 10,
-        message: "QUALIFY is not supported in IBM Db2 syntax",
-        severity: "error",
-        solution: "Use subquery with ROW_NUMBER() function instead"
-      }
-    ]);
-  }, []);
+    setSource(initialSourceCode);
+    setTarget(initialTargetCode);
+    setErrors(initialErrors);
+    
+    // Update stats based on errors
+    if (initialErrors) {
+      setConversionStats({
+        successCount: initialTargetCode ? 1 : 0,
+        warningCount: initialErrors.filter(e => e.severity === 'warning').length,
+        errorCount: initialErrors.filter(e => e.severity === 'error').length,
+      });
+    }
+  }, [initialSourceCode, initialTargetCode, initialErrors]);
   
   const sourceLines = source.split('\n');
   const targetLines = target.split('\n');
   
   const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setSource(e.target.value);
-    // In a real app, we would debounce this and send to backend for syntax checking
+    const newSource = e.target.value;
+    setSource(newSource);
+    if (onSourceChange) {
+      onSourceChange(newSource);
+    }
   };
 
   const handleRunConversion = async () => {
     setIsConverting(true);
     
     try {
+      // Detect if the source is likely Teradata
+      const isTeradataLike = source.toLowerCase().includes('qualify') || 
+                            source.toLowerCase().includes('sel ');
+      
       // Call our simulated backend service
-      const result = await convertSqlSyntax(source, 'teradata', 'db2');
+      const result = await convertSqlSyntax(
+        source, 
+        isTeradataLike ? 'teradata' : 'other',
+        'db2'
+      );
       
       // Update the state with conversion results
       setTarget(result.targetCode);
@@ -123,6 +107,15 @@ const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCo
       title: "Download started",
       description: "Your converted SQL script is being downloaded",
     });
+  };
+  
+  const getTeradataParserAnnotation = () => {
+    if (source.toLowerCase().includes('qualify')) {
+      return `-- Python parser note: QUALIFY detected, will be converted to subquery\n`;
+    } else if (source.toLowerCase().includes('sel ')) {
+      return `-- Python parser note: SEL syntax detected, converting to SELECT\n`;
+    }
+    return '';
   };
   
   return (
@@ -231,7 +224,10 @@ const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCo
               ))}
             </div>
             <div className="p-2 flex-1 font-mono text-sm">
-              <pre className="whitespace-pre-wrap">{target}</pre>
+              <pre className="whitespace-pre-wrap">
+                {target ? getTeradataParserAnnotation() + target : 
+                  "Run conversion to see the transformed code here..."}
+              </pre>
             </div>
           </div>
         </div>
@@ -260,7 +256,7 @@ const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCo
           <Button 
             type="button" 
             className="carbon-button-primary mr-2"
-            disabled={isConverting}
+            disabled={isConverting || !source}
             onClick={handleRunConversion}
           >
             {isConverting ? (
@@ -273,6 +269,7 @@ const CodeEditor = ({ sourceCode = sampleSourceCode, targetCode = sampleTargetCo
           <Button 
             type="button" 
             className="carbon-button-secondary"
+            disabled={!target}
             onClick={handleDownload}
           >
             <Download size={16} className="mr-2" />

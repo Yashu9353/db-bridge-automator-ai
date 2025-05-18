@@ -1,45 +1,141 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import CodeEditor from "@/components/migration/CodeEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Download } from "lucide-react";
+import { ArrowRight, Download, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { downloadSqlFile } from "@/services/databaseService";
+import { downloadSqlFile, convertSqlSyntax } from "@/services/databaseService";
 
 const ConversionEditor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedScript, setSelectedScript] = useState<{
+    id: string;
+    name: string;
+    content: string;
+    sqlType?: "teradata" | "db2" | "other";
+  } | null>(null);
+  
+  const [sourceCode, setSourceCode] = useState("");
+  const [convertedCode, setConvertedCode] = useState("");
+  
   const [conversionIssues, setConversionIssues] = useState<Array<{
     line: number;
     message: string;
     severity: 'warning' | 'error';
     solution?: string;
-  }>>([
-    {
-      line: 8,
-      message: "Table references may require schema qualification in Db2",
-      severity: "warning",
-      solution: "Check schema names in target database"
-    },
-    {
-      line: 10,
-      message: "QUALIFY is not supported in IBM Db2 syntax",
-      severity: "error",
-      solution: "Use subquery with ROW_NUMBER() function instead"
+  }>>([]);
+  
+  // Load the selected script from session storage
+  useEffect(() => {
+    const storedScript = sessionStorage.getItem('selectedScript');
+    if (storedScript) {
+      try {
+        const parsedScript = JSON.parse(storedScript);
+        setSelectedScript(parsedScript);
+        setSourceCode(parsedScript.content);
+        
+        // For demo purposes, if the script contains specific Teradata features, highlight them
+        if (parsedScript.sqlType === 'teradata' || parsedScript.content?.toLowerCase().includes('sel ') || 
+            parsedScript.content?.toLowerCase().includes('qualify')) {
+          const issues = [];
+          
+          if (parsedScript.content?.toLowerCase().includes('qualify')) {
+            issues.push({
+              line: parsedScript.content.toLowerCase().split('\n').findIndex(line => 
+                line.toLowerCase().includes('qualify')) + 1,
+              message: "QUALIFY is not supported in IBM Db2 syntax",
+              severity: "error" as const,
+              solution: "Use subquery with ROW_NUMBER() function instead"
+            });
+          }
+          
+          if (parsedScript.content?.toLowerCase().includes('sel ')) {
+            issues.push({
+              line: parsedScript.content.toLowerCase().split('\n').findIndex(line => 
+                line.toLowerCase().trim().startsWith('sel ')) + 1,
+              message: "SEL abbreviation is not supported in Db2, use SELECT instead",
+              severity: "warning" as const,
+              solution: "Replace 'SEL' with 'SELECT'"
+            });
+          }
+          
+          if (parsedScript.content?.toLowerCase().includes('.')) {
+            issues.push({
+              line: parsedScript.content.toLowerCase().split('\n').findIndex(line => 
+                line.toLowerCase().includes('.')) + 1,
+              message: "Table references may require schema qualification in Db2",
+              severity: "warning" as const,
+              solution: "Check schema names in target database"
+            });
+          }
+          
+          setConversionIssues(issues);
+        }
+      } catch (error) {
+        console.error("Error loading selected script:", error);
+      }
+    } else {
+      // Default content if no script is selected
+      setSourceCode(`-- Teradata sample query
+SELECT 
+  a.customer_id,
+  a.customer_name,
+  b.order_id,
+  b.order_date,
+  b.order_amount
+FROM customer_db.customers a
+INNER JOIN order_db.orders b
+ON a.customer_id = b.customer_id
+WHERE b.order_date BETWEEN DATE '2023-01-01' AND DATE '2023-12-31'
+QUALIFY ROW_NUMBER() OVER (PARTITION BY a.customer_id ORDER BY b.order_date DESC) = 1;`);
     }
-  ]);
+  }, []);
 
-  const handleRunMigration = () => {
+  const handleRunMigration = async () => {
     setIsProcessing(true);
     
-    // Simulate migration process
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      // Simulate conversion process using the databaseService
+      const result = await convertSqlSyntax(
+        sourceCode,
+        selectedScript?.sqlType === 'teradata' ? 'teradata' : 'other',
+        'db2'
+      );
+      
+      setConvertedCode(result.targetCode);
+      setConversionIssues(result.issues);
+      
       toast.success("Migration completed successfully", {
-        description: "SQL conversion has been applied to all scripts"
+        description: `SQL conversion applied with ${result.warningCount} warnings and ${result.errorCount} errors`
       });
-    }, 3000);
+    } catch (error) {
+      toast.error("Migration failed", {
+        description: "An error occurred during SQL conversion"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const handleDownload = () => {
+    if (!convertedCode) {
+      toast.error("No converted code available", {
+        description: "Please run the migration process first"
+      });
+      return;
+    }
+    
+    const fileName = selectedScript?.name 
+      ? `${selectedScript.name.split('.')[0]}_db2.sql` 
+      : "converted_script.sql";
+      
+    downloadSqlFile(convertedCode, fileName);
+    
+    toast.success("Download started", {
+      description: "Your converted SQL script is being downloaded"
+    });
   };
   
   return (
@@ -49,20 +145,17 @@ const ConversionEditor = () => {
           <div>
             <h1 className="text-2xl font-medium text-carbon-gray-100">SQL Conversion</h1>
             <p className="text-carbon-gray-70 mt-1">
-              View and edit your converted SQL code
+              {selectedScript 
+                ? `Converting: ${selectedScript.name}`
+                : "View and edit your converted SQL code"}
             </p>
           </div>
           
           <div className="flex gap-3">
             <Button 
               className="carbon-button-secondary"
-              onClick={() => {
-                const sampleCode = "-- Converted IBM Db2 script\nSELECT * FROM schema.table\nWHERE date BETWEEN DATE('2023-01-01') AND DATE('2023-12-31')";
-                downloadSqlFile(sampleCode, "converted_script.sql");
-                toast.success("Download started", {
-                  description: "Your converted SQL script is being downloaded"
-                });
-              }}
+              disabled={!convertedCode}
+              onClick={handleDownload}
             >
               <Download size={16} className="mr-2" />
               Download Scripts
@@ -70,10 +163,15 @@ const ConversionEditor = () => {
             
             <Button 
               className="carbon-button-primary"
-              disabled={isProcessing}
+              disabled={isProcessing || !sourceCode}
               onClick={handleRunMigration}
             >
-              {isProcessing ? "Processing..." : (
+              {isProcessing ? (
+                <>
+                  <Loader2 size={16} className="mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
                 <>
                   Run Migration
                   <ArrowRight size={16} className="ml-2" />
@@ -82,6 +180,19 @@ const ConversionEditor = () => {
             </Button>
           </div>
         </div>
+        
+        {selectedScript?.sqlType === 'teradata' && (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 flex items-start gap-3">
+            <Info size={20} className="text-blue-500 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-gray-800">Teradata SQL Detected</h3>
+              <p className="text-gray-600 mt-1">
+                This script has been identified as Teradata SQL. The parser will convert Teradata-specific 
+                syntax to IBM Db2 compatible SQL.
+              </p>
+            </div>
+          </div>
+        )}
         
         <Tabs defaultValue="editor">
           <TabsList className="carbon-tabs border-none">
@@ -97,7 +208,12 @@ const ConversionEditor = () => {
           </TabsList>
           
           <TabsContent value="editor" className="pt-4">
-            <CodeEditor />
+            <CodeEditor 
+              sourceCode={sourceCode} 
+              targetCode={convertedCode}
+              errors={conversionIssues}
+              onSourceChange={setSourceCode}
+            />
           </TabsContent>
           
           <TabsContent value="issues" className="pt-4">
@@ -127,7 +243,7 @@ const ConversionEditor = () => {
                   </div>
                 ))}
 
-                {conversionIssues.length === 0 && (
+                {(!conversionIssues || conversionIssues.length === 0) && (
                   <div className="p-6 text-center text-carbon-gray-70">
                     <p>No issues found in your SQL conversion</p>
                   </div>
@@ -142,39 +258,39 @@ const ConversionEditor = () => {
                 <div>
                   <h3 className="font-medium mb-3">Teradata (Source)</h3>
                   <div className="border border-carbon-gray-20 p-3 bg-carbon-gray-10 font-mono text-sm whitespace-pre-line">
-                    SELECT 
-                      a.customer_id,
-                      a.customer_name,
-                      b.order_id,
-                      b.order_date,
-                      b.order_amount
-                    FROM customer_db.customers a
-                    INNER JOIN order_db.orders b
-                    ON a.customer_id = b.customer_id
-                    WHERE b.order_date BETWEEN DATE '2023-01-01' AND DATE '2023-12-31'
-                    QUALIFY ROW_NUMBER() OVER (PARTITION BY a.customer_id ORDER BY b.order_date DESC) = 1;
+                    {sourceCode || `SELECT 
+  a.customer_id,
+  a.customer_name,
+  b.order_id,
+  b.order_date,
+  b.order_amount
+FROM customer_db.customers a
+INNER JOIN order_db.orders b
+ON a.customer_id = b.customer_id
+WHERE b.order_date BETWEEN DATE '2023-01-01' AND DATE '2023-12-31'
+QUALIFY ROW_NUMBER() OVER (PARTITION BY a.customer_id ORDER BY b.order_date DESC) = 1;`}
                   </div>
                 </div>
                 <div>
                   <h3 className="font-medium mb-3">IBM Db2 (Target)</h3>
                   <div className="border border-carbon-gray-20 p-3 bg-carbon-gray-10 font-mono text-sm whitespace-pre-line">
-                    SELECT 
-                      a.customer_id,
-                      a.customer_name,
-                      b.order_id,
-                      b.order_date,
-                      b.order_amount
-                    FROM customer_db.customers a
-                    INNER JOIN order_db.orders b
-                    ON a.customer_id = b.customer_id
-                    WHERE b.order_date BETWEEN DATE('2023-01-01') AND DATE('2023-12-31')
-                    AND (
-                      SELECT COUNT(*) 
-                      FROM order_db.orders b2 
-                      WHERE b2.customer_id = a.customer_id 
-                      AND (b2.order_date {'>'} b.order_date OR 
-                          (b2.order_date = b.order_date AND b2.order_id {'>'} b.order_id))
-                    ) = 0;
+                    {convertedCode || `SELECT 
+  a.customer_id,
+  a.customer_name,
+  b.order_id,
+  b.order_date,
+  b.order_amount
+FROM customer_db.customers a
+INNER JOIN order_db.orders b
+ON a.customer_id = b.customer_id
+WHERE b.order_date BETWEEN DATE('2023-01-01') AND DATE('2023-12-31')
+AND (
+  SELECT COUNT(*) 
+  FROM order_db.orders b2 
+  WHERE b2.customer_id = a.customer_id 
+  AND (b2.order_date {'>'} b.order_date OR 
+      (b2.order_date = b.order_date AND b2.order_id {'>'} b.order_id))
+) = 0;`}
                   </div>
                 </div>
               </div>
