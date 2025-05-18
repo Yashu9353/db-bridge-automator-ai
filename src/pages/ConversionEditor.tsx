@@ -4,7 +4,7 @@ import Layout from "@/components/layout/Layout";
 import CodeEditor from "@/components/migration/CodeEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Download, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowRight, Download, AlertTriangle, CheckCircle, Loader2, Info } from "lucide-react";
 import { toast } from "sonner";
 import { downloadSqlFile, convertSqlSyntax } from "@/services/databaseService";
 

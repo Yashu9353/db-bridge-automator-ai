@@ -1,9 +1,8 @@
-
 // Simulated database service to mimic Python backend functionality
 // In a real implementation, this would make API calls to a Python backend
 
 // Types for database connections
-export type DatabaseType = 'teradata' | 'oracle' | 'sqlserver' | 'postgresql' | 'db2' | 'db2-cloud' | 'db2-warehouse';
+export type DatabaseType = 'teradata' | 'oracle' | 'sqlserver' | 'postgresql' | 'db2' | 'db2-cloud' | 'db2-warehouse' | 'other';
 
 export interface DatabaseConnection {
   id: string;
