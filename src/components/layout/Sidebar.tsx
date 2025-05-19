@@ -50,6 +50,10 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
       <SideNav 
         expanded={isOpen}
         aria-label="Side navigation"
+        // Add required props with empty values to satisfy TypeScript
+        placeholder=""
+        onPointerEnterCapture={() => {}}
+        onPointerLeaveCapture={() => {}}
       >
         <SideNavItems>
           <SideNavLink renderIcon={Home} href="/" isActive={location.pathname === '/'}>
