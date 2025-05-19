@@ -94,3 +94,28 @@
   white-space: nowrap;
   border: 0;
 }
+
+// Additional styles to match IBM design
+.cds--side-nav {
+  background-color: #161616;
+}
+
+.cds--side-nav__link {
+  color: #f4f4f4;
+}
+
+.cds--side-nav__link:hover {
+  background-color: #262626;
+}
+
+.cds--side-nav__link--current {
+  background-color: #0f62fe;
+}
+
+// Adjustment for dashboard tiles
+.cds--tile {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1rem;
+}

@@ -1,79 +1,107 @@
 
+import React, { useState } from 'react';
 import { 
-  FormLabel, 
-  Select, 
-  SelectItem, 
-  Toggle, 
-  Tile 
-} from "@carbon/react";
+  ComboBox, 
+  Checkbox, 
+  RadioButtonGroup, 
+  RadioButton 
+} from '@carbon/react';
 
 type PreferencesStepProps = {
-  optimizationLevel: string;
-  strictMode: boolean;
-  useFeedbackDb: boolean;
-  updateFormData: (key: string, value: string | boolean) => void;
-}
+  updateStepData: (data: any) => void;
+  stepData: any;
+};
 
-const PreferencesStep = ({ optimizationLevel, strictMode, useFeedbackDb, updateFormData }: PreferencesStepProps) => {
+const optimizationLevels = [
+  { id: 'auto', text: 'Automatic (recommended)' },
+  { id: 'balanced', text: 'Balanced' },
+  { id: 'performance', text: 'Performance optimized' },
+  { id: 'compatibility', text: 'Compatibility optimized' },
+];
+
+const PreferencesStep: React.FC<PreferencesStepProps> = ({ updateStepData, stepData }) => {
+  const [optimizationLevel, setOptimizationLevel] = useState(stepData?.optimizationLevel || '');
+  const [includeComments, setIncludeComments] = useState(stepData?.includeComments ?? true);
+  const [validateConversion, setValidateConversion] = useState(stepData?.validateConversion ?? true);
+  const [conversionMode, setConversionMode] = useState(stepData?.conversionMode || 'automated');
+
+  const handleOptimizationChange = (selected: { selectedItem?: { id: string, text: string } }) => {
+    if (selected.selectedItem) {
+      const level = selected.selectedItem.id;
+      setOptimizationLevel(level);
+      updateStepData({ ...stepData, optimizationLevel: level });
+    }
+  };
+
+  const handleCommentsChange = (checked: boolean) => {
+    setIncludeComments(checked);
+    updateStepData({ ...stepData, includeComments: checked });
+  };
+
+  const handleValidationChange = (checked: boolean) => {
+    setValidateConversion(checked);
+    updateStepData({ ...stepData, validateConversion: checked });
+  };
+
+  const handleModeChange = (value: string) => {
+    setConversionMode(value);
+    updateStepData({ ...stepData, conversionMode: value });
+  };
+
   return (
-    <div className="cds--form">
-      <h2 className="cds--type-productive-heading-03 cds--mb-04">Preferences</h2>
-      <p className="cds--type-body-long-01 cds--mb-05">Configure your conversion preferences</p>
+    <div>
+      <div className="cds--form-item cds--mb-05">
+        <label htmlFor="optimization-level" className="cds--label">Optimization Level</label>
+        <ComboBox
+          id="optimization-level"
+          titleText=""
+          label="Select optimization level"
+          items={optimizationLevels}
+          initialSelectedItem={optimizationLevels.find(item => item.id === optimizationLevel)}
+          onChange={handleOptimizationChange}
+          className="cds--mb-04"
+          placeholder="Select optimization level"
+        />
+      </div>
       
-      <div className="cds--mb-07">
-        <div>
-          <FormLabel>Optimization Level</FormLabel>
-          <Select
-            id="optimizationLevel"
-            defaultValue={optimizationLevel}
-            onChange={(e) => updateFormData("optimizationLevel", e.target.value)}
-            className="cds--mb-05"
+      <div className="cds--form-item cds--mb-05">
+        <fieldset className="cds--fieldset">
+          <legend className="cds--label">Conversion Mode</legend>
+          <RadioButtonGroup 
+            name="conversion-mode" 
+            valueSelected={conversionMode}
+            onChange={handleModeChange}
           >
-            <SelectItem value="minimal" text="Minimal - Focus on compatibility" />
-            <SelectItem value="moderate" text="Moderate - Balance compatibility and performance" />
-            <SelectItem value="aggressive" text="Aggressive - Focus on performance optimization" />
-          </Select>
-        </div>
-        
-        <Tile className="cds--mb-03">
-          <div className="cds--form-item">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <FormLabel>Strict Mode</FormLabel>
-                <p className="cds--type-body-short-01 cds--mt-02">
-                  Enforce strict SQL syntax compatibility during conversion
-                </p>
-              </div>
-              <Toggle
-                id="strictMode"
-                labelA=""
-                labelB=""
-                toggled={strictMode}
-                onToggle={(toggled) => updateFormData("strictMode", toggled)}
-              />
-            </div>
-          </div>
-        </Tile>
-        
-        <Tile>
-          <div className="cds--form-item">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <FormLabel>Use Feedback Database</FormLabel>
-                <p className="cds--type-body-short-01 cds--mt-02">
-                  Store conversion feedback to improve future migrations
-                </p>
-              </div>
-              <Toggle
-                id="useFeedbackDb"
-                labelA=""
-                labelB=""
-                toggled={useFeedbackDb}
-                onToggle={(toggled) => updateFormData("useFeedbackDb", toggled)}
-              />
-            </div>
-          </div>
-        </Tile>
+            <RadioButton
+              id="conversion-automated"
+              labelText="Automated (AI-powered)"
+              value="automated"
+            />
+            <RadioButton
+              id="conversion-interactive" 
+              labelText="Interactive (manual review)" 
+              value="interactive"
+            />
+          </RadioButtonGroup>
+        </fieldset>
+      </div>
+      
+      <div className="cds--form-item cds--mb-04">
+        <Checkbox
+          id="include-comments"
+          labelText="Include comments in converted code"
+          checked={includeComments}
+          onChange={(_, { checked }) => handleCommentsChange(checked)}
+        />
+      </div>
+      
+      <div className="cds--form-item">
+        <Checkbox
+          id="validate-conversion"
+          labelText="Validate conversion results"
+          checked={validateConversion}
+          onChange={(_, { checked }) => handleValidationChange(checked)}
+        />
       </div>
     </div>
   );

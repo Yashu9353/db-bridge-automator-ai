@@ -1,5 +1,5 @@
 
-import { ProgressBar } from "@carbon/react";
+import { ProgressIndicator, ProgressStep } from "@carbon/react";
 
 type Step = {
   title: string;
@@ -12,9 +12,6 @@ type StepIndicatorProps = {
 };
 
 const StepIndicator = ({ steps, currentStep }: StepIndicatorProps) => {
-  // Calculate progress percentage
-  const progressPercentage = (currentStep / (steps.length - 1)) * 100;
-  
   return (
     <div className="cds--mb-07">
       <div className="cds--mb-03">
@@ -26,28 +23,16 @@ const StepIndicator = ({ steps, currentStep }: StepIndicatorProps) => {
         </p>
       </div>
       
-      <ProgressBar 
-        value={progressPercentage} 
-        max={100} 
-        label={`Step ${currentStep + 1} of ${steps.length}`} 
-        helperText={steps[currentStep].title}
-      />
-      
-      <div className="cds--mt-05">
-        <div className="cds--progress-step-button-container">
-          {steps.map((step, index) => (
-            <div
-              key={index}
-              className={`cds--progress-step-button 
-                ${index < currentStep ? 'cds--progress-step-button--complete' : ''} 
-                ${index === currentStep ? 'cds--progress-step-button--current' : ''}
-                ${index > currentStep ? 'cds--progress-step-button--incomplete' : ''}`}
-            >
-              <span className="cds--progress-step-button__label">{step.title}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <ProgressIndicator currentIndex={currentStep} spaceEqually>
+        {steps.map((step, index) => (
+          <ProgressStep 
+            key={index} 
+            label={step.title} 
+            current={index === currentStep}
+            complete={index < currentStep}
+          />
+        ))}
+      </ProgressIndicator>
     </div>
   );
 };

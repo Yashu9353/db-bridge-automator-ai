@@ -1,5 +1,5 @@
 
-import { Grid, Column, Button, Tile } from "@carbon/react";
+import { Grid, Column, Tile, Tag } from "@carbon/react";
 import Layout from "../components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import DashboardCard from "../components/dashboard/DashboardCard";
@@ -12,55 +12,54 @@ const Index = () => {
 
   return (
     <Layout>
-      <Grid fullWidth className="cds--mb-07">
+      <div className="cds--content-banner" style={{ backgroundColor: "#0043ce", color: "#ffffff", padding: "2rem 1rem" }}>
+        <div className="cds--grid cds--grid--narrow">
+          <div className="cds--row">
+            <div className="cds--col-lg-10 cds--col-md-8 cds--col-sm-4">
+              <h1 className="cds--type-productive-heading-05 cds--mb-02">
+                Welcome to IBM Database Modernization
+              </h1>
+              <p className="cds--type-body-long-01">
+                Automate your database migration from various platforms to IBM databases using our AI-powered
+                conversion tool. Configure your databases, upload scripts, and run migrations with ease.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Grid narrow className="cds--mb-07">
         <Column lg={16} md={8} sm={4} className="cds--mb-05">
-          <h1 className="cds--type-productive-heading-05">Database Migration Dashboard</h1>
-          <p className="cds--type-body-long-01 cds--mt-02 cds--mb-03">
-            Monitor, manage, and execute your database migration projects
-          </p>
+          <h2 className="cds--type-productive-heading-03">Migration Summary</h2>
         </Column>
       </Grid>
 
-      <Grid fullWidth className="cds--mb-07">
+      <Grid narrow className="cds--mb-07">
         <Column lg={16} md={8} sm={4} className="cds--mb-07">
           <MigrationSummary />
         </Column>
 
-        <Column lg={10} md={5} sm={4} className="cds--mb-05">
-          <DashboardCard title="Quick Actions" className="cds--dashboard-card cds--h-full">
-            <QuickActions />
-          </DashboardCard>
+        <Column lg={16} md={8} sm={4} className="cds--mb-05">
+          <h2 className="cds--type-productive-heading-03">Quick Actions</h2>
+        </Column>
+        
+        <Column lg={16} md={8} sm={4} className="cds--mb-07">
+          <QuickActions />
         </Column>
 
-        <Column lg={6} md={3} sm={4} className="cds--mb-05">
-          <DashboardCard title="Getting Started" className="cds--dashboard-card cds--h-full">
-            <p className="cds--type-body-long-01 cds--mb-05">
-              New to the migration process? Start with these resources to guide you through your
-              database migration journey.
-            </p>
-            <div className="cds--btn-set cds--btn-set--stacked">
-              <Button 
-                kind="tertiary" 
-                size="md"
-                onClick={() => navigate('/questionnaire/create')}
-              >
-                Setup a New Migration
-              </Button>
-              <Button
-                kind="tertiary"
-                size="md"
-                onClick={() => navigate('/database/connections')}
-              >
-                Configure Connections
-              </Button>
+        <Column lg={16} md={8} sm={4} className="cds--mb-05">
+          <div className="cds--row cds--row-padding">
+            <div className="cds--col-lg-12 cds--col-md-6 cds--col-sm-4">
+              <h2 className="cds--type-productive-heading-03">Recent Migrations</h2>
             </div>
-          </DashboardCard>
+            <div className="cds--col-lg-4 cds--col-md-2 cds--col-sm-4" style={{textAlign: 'right'}}>
+              <a href="#" className="cds--link">View all</a>
+            </div>
+          </div>
         </Column>
 
         <Column lg={16} md={8} sm={4}>
-          <DashboardCard title="Recent Migrations" className="cds--dashboard-card">
-            <RecentMigrations />
-          </DashboardCard>
+          <RecentMigrations />
         </Column>
       </Grid>
     </Layout>

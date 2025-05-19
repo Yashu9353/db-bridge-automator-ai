@@ -1,17 +1,18 @@
 
 import Layout from "@/components/layout/Layout";
-import { Grid, Column, InlineNotification } from "@carbon/react";
-import { Information } from "@carbon/icons-react";
+import { Grid, Column, InlineNotification, FileUploader } from "@carbon/react";
+import { Upload } from "@carbon/icons-react";
+import PageHeader from "@/components/layout/PageHeader";
 
 const ScriptUpload = () => {
   return (
     <Layout>
       <Grid narrow>
         <Column lg={16} md={8} sm={4}>
-          <h1 className="cds--type-productive-heading-04 cds--mb-03">Upload SQL Scripts</h1>
-          <p className="cds--type-body-long-01 cds--mb-05">
-            Upload SQL, BTEQ, or stored procedure scripts for conversion
-          </p>
+          <PageHeader 
+            title="Upload SQL Scripts"
+            description="Upload SQL, BTEQ, or stored procedure scripts for conversion"
+          />
           
           <InlineNotification
             kind="info"
@@ -20,7 +21,18 @@ const ScriptUpload = () => {
             className="cds--mb-05"
           />
           
-          {/* FileUploader component will be implemented here */}
+          <div className="cds--mb-07">
+            <FileUploader
+              labelTitle="Upload SQL Scripts"
+              labelDescription="Drag and drop files here or click to upload"
+              buttonLabel="Add files"
+              filenameStatus="edit"
+              accept={['.sql', '.bteq', '.txt']}
+              multiple={true}
+              iconDescription="Clear file"
+              name="fileUploader"
+            />
+          </div>
         </Column>
       </Grid>
     </Layout>

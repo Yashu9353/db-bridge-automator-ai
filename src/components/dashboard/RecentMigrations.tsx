@@ -7,14 +7,16 @@ import {
   TableHeader,
   TableBody,
   TableCell,
-  Link
+  Link,
+  Tag
 } from "@carbon/react";
 import {
-  Code,
+  DocumentPdf,
   CheckmarkFilled,
   WarningAltFilled,
-  CloseFilled
+  ErrorFilled
 } from "@carbon/icons-react";
+import React from "react";
 
 type Migration = {
   id: string;
@@ -60,14 +62,29 @@ const recentMigrations: Migration[] = [
   }
 ];
 
-const StatusIcon = ({ status }: { status: Migration["status"] }) => {
+const StatusTag = ({ status }: { status: Migration["status"] }) => {
   if (status === "success") {
-    return <CheckmarkFilled size={16} className="cds--icon--support-02" />;
+    return (
+      <Tag type="green" size="sm">
+        <CheckmarkFilled size={16} className="cds--tag__icon" />
+        Successful
+      </Tag>
+    );
   }
   if (status === "warning") {
-    return <WarningAltFilled size={16} className="cds--icon--support-03" />;
+    return (
+      <Tag type="yellow" size="sm">
+        <WarningAltFilled size={16} className="cds--tag__icon" />
+        Warnings
+      </Tag>
+    );
   }
-  return <CloseFilled size={16} className="cds--icon--support-01" />;
+  return (
+    <Tag type="red" size="sm">
+      <ErrorFilled size={16} className="cds--tag__icon" />
+      Failed
+    </Tag>
+  );
 };
 
 const headers = [
@@ -83,7 +100,7 @@ const RecentMigrations = () => {
     id: migration.id,
     name: (
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <Code size={16} className="cds--icon--interactive-01" />
+        <DocumentPdf size={16} />
         <Link href={`/migration/${migration.id}`}>
           {migration.name}
         </Link>
@@ -92,22 +109,13 @@ const RecentMigrations = () => {
     source: migration.source,
     target: migration.target,
     date: migration.date,
-    status: (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <StatusIcon status={migration.status} />
-        <span>
-          {migration.status === "success" && "Successful"}
-          {migration.status === "warning" && "Warnings"}
-          {migration.status === "error" && "Failed"}
-        </span>
-      </div>
-    ),
+    status: <StatusTag status={migration.status} />,
   }));
 
   return (
-    <DataTable rows={rows} headers={headers}>
+    <DataTable rows={rows} headers={headers} size="sm">
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-        <Table {...getTableProps()} size="compact">
+        <Table {...getTableProps()}>
           <TableHead>
             <TableRow>
               {headers.map((header) => (
