@@ -4,10 +4,9 @@ import Layout from "@/components/layout/Layout";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Database, Table as TableIcon, FileCode, Activity, Key } from "lucide-react";
+import { Database, Table as TableIcon, FileCode, Activity, Key, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { fetchDatabaseSchema, getDatabaseConnections } from "@/services/databaseService";
-import { Loading } from "@carbon/react";
 
 // Schema browser component
 const SchemaBrowser = () => {
@@ -68,7 +67,7 @@ const SchemaBrowser = () => {
     if (isLoading) {
       return (
         <div className="flex items-center justify-center h-64">
-          <Loading small description="Loading schema information..." withOverlay={false} />
+          <Loader2 size={32} className="animate-spin text-carbon-blue" />
           <span className="ml-2 text-carbon-gray-70">Loading schema information...</span>
         </div>
       );
@@ -223,7 +222,7 @@ const SchemaBrowser = () => {
                   <AccordionContent className="p-2 space-y-1">
                     {isLoading ? (
                       <div className="flex items-center justify-center py-4">
-                        <Loading small description="Loading..." withOverlay={false} />
+                        <Loader2 size={16} className="animate-spin text-carbon-blue" />
                         <span className="ml-2 text-sm">Loading...</span>
                       </div>
                     ) : (

@@ -1,66 +1,49 @@
 
-import { Grid, Column, ClickableTile } from "@carbon/react";
-import { Upload, DataBase, Play } from "@carbon/icons-react";
-import { useNavigate } from "react-router-dom";
+import { Upload, Database, Play } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const QuickActions = () => {
-  const navigate = useNavigate();
-  
   const actions = [
     {
       title: "Upload Scripts",
       description: "Import SQL and stored procedure scripts",
       icon: Upload,
       href: "/scripts/upload",
-      color: "#0f62fe" // IBM blue
+      color: "bg-carbon-blue text-white"
     },
     {
       title: "Connect Database",
       description: "Configure source and target connections",
-      icon: DataBase,
+      icon: Database,
       href: "/database/connections",
-      color: "#0f62fe" // IBM blue
+      color: "bg-carbon-blue-70 text-white"
     },
     {
       title: "Run Migration",
       description: "Execute database migration and conversion",
       icon: Play,
-      href: "/conversion/editor",
-      color: "#0f62fe" // IBM blue
+      href: "/conversion/editor", // Making sure this path is correct
+      color: "bg-carbon-blue-80 text-white"
     }
   ];
   
   return (
-    <Grid>
-      {actions.map((action, index) => (
-        <Column sm={4} md={8/3} lg={16/3} key={index}>
-          <ClickableTile
-            className="cds--tile-action"
-            style={{
-              backgroundColor: action.color,
-              color: '#ffffff',
-              height: '100%',
-              padding: '1.5rem'
-            }}
-            onClick={() => navigate(action.href)}
-          >
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'flex-start',
-              marginBottom: '1rem' 
-            }}>
-              <action.icon size={24} />
-              <div style={{ fontSize: '1.25rem' }}>&rarr;</div>
-            </div>
-            <h3 className="cds--type-productive-heading-02">{action.title}</h3>
-            <p className="cds--type-body-short-01" style={{ marginTop: '0.5rem' }}>
-              {action.description}
-            </p>
-          </ClickableTile>
-        </Column>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {actions.map((action) => (
+        <Link
+          key={action.title}
+          to={action.href}
+          className={`${action.color} p-4 flex flex-col hover:shadow-md transition-shadow`}
+        >
+          <div className="flex justify-between items-center mb-3">
+            <action.icon size={24} />
+            <span className="text-sm">→</span>
+          </div>
+          <h3 className="font-medium text-lg mb-1">{action.title}</h3>
+          <p className="text-sm opacity-80">{action.description}</p>
+        </Link>
       ))}
-    </Grid>
+    </div>
   );
 };
 

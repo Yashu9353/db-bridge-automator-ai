@@ -1,61 +1,36 @@
 
-import { Grid, Column, Tile } from "@carbon/react";
-import {
-  ChartColumnFloating,
-  CheckmarkFilled,
-  WarningAltFilled,
-  ErrorFilled
-} from "@carbon/icons-react";
+import { BarChart2, ArrowUpRight, CheckCircle, AlertTriangle, X } from "lucide-react";
 
 const MigrationSummary = () => {
   const stats = [
-    { 
-      label: "Total Scripts", 
-      value: 128, 
-      icon: ChartColumnFloating, 
-      color: "#0f62fe" // IBM blue
-    },
-    { 
-      label: "Successfully Converted", 
-      value: 89, 
-      icon: CheckmarkFilled, 
-      color: "#24a148" // IBM green  
-    },
-    { 
-      label: "Warnings", 
-      value: 32, 
-      icon: WarningAltFilled, 
-      color: "#f1c21b" // IBM yellow
-    },
-    { 
-      label: "Failed", 
-      value: 7, 
-      icon: ErrorFilled, 
-      color: "#da1e28" // IBM red
-    },
+    { label: "Total Scripts", value: 128, icon: BarChart2, color: "text-carbon-blue" },
+    { label: "Successfully Converted", value: 89, icon: CheckCircle, color: "text-carbon-success" },
+    { label: "Warnings", value: 32, icon: AlertTriangle, color: "text-carbon-warning" },
+    { label: "Failed", value: 7, icon: X, color: "text-carbon-error" },
   ];
   
   return (
-    <Grid>
-      {stats.map((stat, index) => (
-        <Column sm={4} md={4} lg={4} key={index}>
-          <Tile style={{ height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <stat.icon size={24} style={{ color: stat.color }} />
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.3 3.7L13.1 7.5 9.3 11.3 8.6 10.6 11.2 8 3 8 3 7 11.2 7 8.6 4.4z" />
-              </svg>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {stats.map((stat) => (
+        <div 
+          key={stat.label}
+          className="bg-white border border-carbon-gray-20 p-4 flex flex-col"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <span className={`${stat.color}`}>
+              <stat.icon size={24} />
+            </span>
+            <ArrowUpRight size={16} className="text-carbon-gray-60" />
+          </div>
+          <div className="mt-auto">
+            <div className="text-2xl font-semibold text-carbon-gray-100 mb-1">
+              {stat.value}
             </div>
-            <div>
-              <div className="cds--type-productive-heading-03" style={{ marginBottom: '0.5rem' }}>
-                {stat.value}
-              </div>
-              <div className="cds--type-body-short-01">{stat.label}</div>
-            </div>
-          </Tile>
-        </Column>
+            <div className="text-sm text-carbon-gray-60">{stat.label}</div>
+          </div>
+        </div>
       ))}
-    </Grid>
+    </div>
   );
 };
 

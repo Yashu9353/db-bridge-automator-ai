@@ -1,36 +1,56 @@
-
 import { useState, useContext } from "react";
 import { 
-  SideNav,
-  SideNavItems,
-  SideNavLink,
-  SideNavMenu,
-  SideNavMenuItem,
-  Button
-} from "@carbon/react";
-import { 
-  Home, 
-  DataBase, 
-  DocumentPdf, 
-  Play, 
-  CheckmarkOutline, 
-  WarningAlt, 
-  ChartLineData, 
-  Settings, 
-  Logout 
-} from "@carbon/icons-react";
-import { useNavigate, useLocation } from "react-router-dom";
+  Home, Database, FileCode, Play, 
+  CheckSquare, AlertTriangle, BarChart, Settings, 
+  Users, ChevronRight, ChevronDown, LogOut 
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../App";
 
 type SidebarProps = {
   isOpen: boolean;
 };
 
+type NavItem = {
+  label: string;
+  icon: React.ElementType;
+  href: string;
+  active?: boolean;
+  children?: NavItem[];
+};
+
+const navItems: NavItem[] = [
+  { label: "Dashboard", icon: Home, href: "/", active: true },
+  { 
+    label: "Database", 
+    icon: Database, 
+    href: "#",
+    children: [
+      { label: "Connections", icon: ChevronRight, href: "/database/connections" },
+      { label: "Schema Browser", icon: ChevronRight, href: "/database/schema" },
+    ] 
+  },
+  { 
+    label: "SQL Scripts", 
+    icon: FileCode, 
+    href: "#",
+    children: [
+      { label: "Manage Scripts", icon: ChevronRight, href: "/scripts/manage" },
+    ] 
+  },
+  { label: "Run Migrations", icon: Play, href: "/run" },
+  { label: "Validation Results", icon: CheckSquare, href: "/validation" },
+  { label: "Issues & Fixes", icon: AlertTriangle, href: "/issues" },
+  { label: "Reports", icon: BarChart, href: "/reports" },
+  { label: "Settings", icon: Settings, href: "/settings" },
+  { label: "User Management", icon: Users, href: "/users" },
+];
+
 const Sidebar = ({ isOpen }: SidebarProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
   
   const handleLogout = () => {
     logout();
@@ -46,88 +66,90 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
   };
 
   return (
-    <div className="cds--side-nav--fixed">
-      <SideNav 
-        expanded={isOpen}
-        aria-label="Side navigation"
-        // Add required props with empty values to satisfy TypeScript
-        placeholder=""
-        onPointerEnterCapture={() => {}}
-        onPointerLeaveCapture={() => {}}
-      >
-        <SideNavItems>
-          <SideNavLink renderIcon={Home} href="/" isActive={location.pathname === '/'}>
-            Dashboard
-          </SideNavLink>
-          
-          <SideNavMenu 
-            renderIcon={DataBase} 
-            title="Database" 
-            isActive={location.pathname.startsWith('/database')}
-          >
-            <SideNavMenuItem href="/database/connections" isActive={location.pathname === '/database/connections'}>
-              Connections
-            </SideNavMenuItem>
-            <SideNavMenuItem href="/database/schema" isActive={location.pathname === '/database/schema'}>
-              Schema Browser
-            </SideNavMenuItem>
-          </SideNavMenu>
-          
-          <SideNavMenu 
-            renderIcon={DocumentPdf} 
-            title="SQL Scripts" 
-            isActive={location.pathname.startsWith('/scripts')}
-          >
-            <SideNavMenuItem href="/scripts/manage" isActive={location.pathname === '/scripts/manage'}>
-              Manage Scripts
-            </SideNavMenuItem>
-            <SideNavMenuItem href="/scripts/upload" isActive={location.pathname === '/scripts/upload'}>
-              Upload Scripts
-            </SideNavMenuItem>
-          </SideNavMenu>
-          
-          <SideNavLink renderIcon={Play} href="/run" isActive={location.pathname === '/run'}>
-            Run Migrations
-          </SideNavLink>
-          
-          <SideNavLink renderIcon={CheckmarkOutline} href="/validation" isActive={location.pathname === '/validation'}>
-            Validation Results
-          </SideNavLink>
-          
-          <SideNavLink renderIcon={WarningAlt} href="/issues" isActive={location.pathname === '/issues'}>
-            Issues & Fixes
-          </SideNavLink>
-          
-          <SideNavLink renderIcon={ChartLineData} href="/reports" isActive={location.pathname === '/reports'}>
-            Reports
-          </SideNavLink>
-          
-          <SideNavLink renderIcon={Settings} href="/settings" isActive={location.pathname === '/settings'}>
-            Settings
-          </SideNavLink>
-        </SideNavItems>
+    <div 
+      className={cn(
+        "bg-carbon-gray-10 border-r border-carbon-gray-20 h-[calc(100vh-64px)] fixed left-0 top-16 transition-all duration-300 z-20",
+        isOpen ? "w-64" : "w-0 -translate-x-full"
+      )}
+    >
+      <div className="h-full flex flex-col">
+        <nav className="flex-1 overflow-y-auto py-6">
+          <ul className="space-y-1 px-3">
+            {navItems.map((item) => (
+              <li key={item.label}>
+                {item.children ? (
+                  <div>
+                    <button
+                      onClick={() => toggleExpanded(item.label)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2 text-carbon-gray-70 hover:bg-carbon-gray-20 rounded-sm group",
+                        expandedItems.includes(item.label) && "bg-carbon-gray-20"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <item.icon size={18} />
+                        <span className="text-sm font-medium">{item.label}</span>
+                      </div>
+                      {expandedItems.includes(item.label) ? (
+                        <ChevronDown size={16} />
+                      ) : (
+                        <ChevronRight size={16} />
+                      )}
+                    </button>
+                    
+                    {expandedItems.includes(item.label) && (
+                      <ul className="pl-9 mt-1 space-y-1">
+                        {item.children.map(child => (
+                          <li key={child.label}>
+                            <Link
+                              to={child.href}
+                              className="block px-3 py-1.5 text-sm text-carbon-gray-70 hover:bg-carbon-gray-20 rounded-sm"
+                            >
+                              {child.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 hover:bg-carbon-gray-20 rounded-sm",
+                      item.active 
+                        ? "text-carbon-blue border-l-4 border-carbon-blue pl-2" 
+                        : "text-carbon-gray-70"
+                    )}
+                  >
+                    <item.icon size={18} />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
         
-        <div className="cds--side-nav__footer">
-          <div className="cds--side-nav__user-info">
-            <div className="cds--side-nav__user-avatar" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--cds-interactive-01)' }}>
+        <div className="p-4 border-t border-carbon-gray-20">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-8 w-8 rounded-full bg-carbon-blue text-white flex items-center justify-center font-medium">
               JD
             </div>
             <div>
-              <p className="cds--side-nav__user-name">Logged in</p>
-              <p className="cds--side-nav__user-status">Administrator</p>
+              <p className="text-sm font-medium text-carbon-gray-90">Logged in</p>
+              <p className="text-xs text-carbon-gray-60">Administrator</p>
             </div>
           </div>
-          <Button 
-            kind="ghost" 
-            size="sm" 
-            onClick={handleLogout} 
-            renderIcon={Logout}
-            iconDescription="Logout"
+          <button 
+            className="flex items-center gap-2 text-carbon-gray-70 hover:text-carbon-blue text-sm mt-2"
+            onClick={handleLogout}
           >
-            Log out
-          </Button>
+            <LogOut size={16} />
+            <span>Log out</span>
+          </button>
         </div>
-      </SideNav>
+      </div>
     </div>
   );
 };

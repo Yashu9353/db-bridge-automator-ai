@@ -1,106 +1,64 @@
 
-import React, { useState } from 'react';
-import { 
-  ComboBox, 
-  Checkbox, 
-  RadioButtonGroup, 
-  RadioButton 
-} from '@carbon/react';
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 type PreferencesStepProps = {
-  updateStepData: (data: any) => void;
-  stepData: any;
-};
+  optimizationLevel: string;
+  strictMode: boolean;
+  useFeedbackDb: boolean;
+  updateFormData: (key: string, value: string | boolean) => void;
+}
 
-const optimizationLevels = [
-  { id: 'auto', text: 'Automatic (recommended)' },
-  { id: 'balanced', text: 'Balanced' },
-  { id: 'performance', text: 'Performance optimized' },
-  { id: 'compatibility', text: 'Compatibility optimized' },
-];
-
-const PreferencesStep: React.FC<PreferencesStepProps> = ({ updateStepData, stepData }) => {
-  const [optimizationLevel, setOptimizationLevel] = useState(stepData?.optimizationLevel || '');
-  const [includeComments, setIncludeComments] = useState(stepData?.includeComments ?? true);
-  const [validateConversion, setValidateConversion] = useState(stepData?.validateConversion ?? true);
-  const [conversionMode, setConversionMode] = useState(stepData?.conversionMode || 'automated');
-
-  const handleOptimizationChange = (selected: { selectedItem?: { id: string, text: string } }) => {
-    if (selected.selectedItem) {
-      const level = selected.selectedItem.id;
-      setOptimizationLevel(level);
-      updateStepData({ ...stepData, optimizationLevel: level });
-    }
-  };
-
-  const handleCommentsChange = (checked: boolean) => {
-    setIncludeComments(checked);
-    updateStepData({ ...stepData, includeComments: checked });
-  };
-
-  const handleValidationChange = (checked: boolean) => {
-    setValidateConversion(checked);
-    updateStepData({ ...stepData, validateConversion: checked });
-  };
-
-  const handleModeChange = (value: string) => {
-    setConversionMode(value);
-    updateStepData({ ...stepData, conversionMode: value });
-  };
-
+const PreferencesStep = ({ optimizationLevel, strictMode, useFeedbackDb, updateFormData }: PreferencesStepProps) => {
   return (
-    <div>
-      <div className="cds--form-item cds--mb-05">
-        <label htmlFor="optimization-level" className="cds--label">Optimization Level</label>
-        <ComboBox
-          id="optimization-level"
-          titleText=""
-          items={optimizationLevels}
-          initialSelectedItem={optimizationLevels.find(item => item.id === optimizationLevel)}
-          onChange={handleOptimizationChange}
-          className="cds--mb-04"
-          placeholder="Select optimization level"
-        />
-      </div>
+    <div className="space-y-6">
+      <h2 className="text-xl font-medium text-carbon-gray-100">Preferences</h2>
+      <p className="text-carbon-gray-70">Configure your conversion preferences</p>
       
-      <div className="cds--form-item cds--mb-05">
-        <fieldset className="cds--fieldset">
-          <legend className="cds--label">Conversion Mode</legend>
-          <RadioButtonGroup 
-            name="conversion-mode" 
-            valueSelected={conversionMode}
-            onChange={handleModeChange}
+      <div className="space-y-5">
+        <div>
+          <Label htmlFor="optimizationLevel" className="carbon-label">Optimization Level</Label>
+          <Select
+            value={optimizationLevel}
+            onValueChange={(value) => updateFormData("optimizationLevel", value)}
           >
-            <RadioButton
-              id="conversion-automated"
-              labelText="Automated (AI-powered)"
-              value="automated"
-            />
-            <RadioButton
-              id="conversion-interactive" 
-              labelText="Interactive (manual review)" 
-              value="interactive"
-            />
-          </RadioButtonGroup>
-        </fieldset>
-      </div>
-      
-      <div className="cds--form-item cds--mb-04">
-        <Checkbox
-          id="include-comments"
-          labelText="Include comments in converted code"
-          checked={includeComments}
-          onChange={(_, { checked }) => handleCommentsChange(checked)}
-        />
-      </div>
-      
-      <div className="cds--form-item">
-        <Checkbox
-          id="validate-conversion"
-          labelText="Validate conversion results"
-          checked={validateConversion}
-          onChange={(_, { checked }) => handleValidationChange(checked)}
-        />
+            <SelectTrigger className="carbon-field">
+              <SelectValue placeholder="Select optimization level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="minimal">Minimal - Focus on compatibility</SelectItem>
+              <SelectItem value="moderate">Moderate - Balance compatibility and performance</SelectItem>
+              <SelectItem value="aggressive">Aggressive - Focus on performance optimization</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="flex items-center justify-between border border-carbon-gray-30 p-4">
+          <div>
+            <Label className="text-base font-medium">Strict Mode</Label>
+            <p className="text-sm text-carbon-gray-60">
+              Enforce strict SQL syntax compatibility during conversion
+            </p>
+          </div>
+          <Switch
+            checked={strictMode}
+            onCheckedChange={(checked) => updateFormData("strictMode", checked)}
+          />
+        </div>
+        
+        <div className="flex items-center justify-between border border-carbon-gray-30 p-4">
+          <div>
+            <Label className="text-base font-medium">Use Feedback Database</Label>
+            <p className="text-sm text-carbon-gray-60">
+              Store conversion feedback to improve future migrations
+            </p>
+          </div>
+          <Switch
+            checked={useFeedbackDb}
+            onCheckedChange={(checked) => updateFormData("useFeedbackDb", checked)}
+          />
+        </div>
       </div>
     </div>
   );

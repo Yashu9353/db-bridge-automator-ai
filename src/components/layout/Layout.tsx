@@ -1,67 +1,37 @@
 
 import { useState } from "react";
-import { 
-  Header, 
-  HeaderContainer,
-  HeaderName,
-  HeaderNavigation,
-  HeaderMenuItem,
-  HeaderGlobalBar,
-  HeaderGlobalAction,
-  SkipToContent,
-  Content
-} from "@carbon/react";
-import {
-  Settings,
-  User,
-  Logout
-} from "@carbon/icons-react";
+import Header from "./Header";
 import Sidebar from "./Sidebar";
+import { cn } from "@/lib/utils";
 
 type LayoutProps = {
   children: React.ReactNode;
 };
 
 const Layout = ({ children }: LayoutProps) => {
-  const [isSideNavExpanded, setIsSideNavExpanded] = useState(true);
-  
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <>
-      <HeaderContainer
-        render={({ isSideNavExpanded, onClickSideNavExpand }) => (
-          <>
-            <Header aria-label="IBM Database Migration">
-              <SkipToContent />
-              <HeaderName href="/" prefix="">
-                IBM Database Migration
-              </HeaderName>
-              <HeaderNavigation aria-label="IBM Database Migration">
-                <HeaderMenuItem href="/questionnaire">Questionnaires</HeaderMenuItem>
-                <HeaderMenuItem href="/database/connections">Connections</HeaderMenuItem>
-                <HeaderMenuItem href="/conversion/editor">Conversion</HeaderMenuItem>
-              </HeaderNavigation>
-              <HeaderGlobalBar>
-                <HeaderGlobalAction aria-label="Settings" tooltipAlignment="end">
-                  <Settings size={20} />
-                </HeaderGlobalAction>
-                <HeaderGlobalAction aria-label="User" tooltipAlignment="end">
-                  <User size={20} />
-                </HeaderGlobalAction>
-                <HeaderGlobalAction aria-label="Logout" tooltipAlignment="end">
-                  <Logout size={20} />
-                </HeaderGlobalAction>
-              </HeaderGlobalBar>
-            </Header>
-          </>
-        )}
-      />
-      <div className="cds--side-nav-container">
-        <Sidebar isOpen={isSideNavExpanded} />
-        <Content className={isSideNavExpanded ? 'cds--content--expanded' : ''}>
-          {children}
-        </Content>
+    <div className="min-h-screen flex flex-col">
+      <Header toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+      <div className="flex flex-1">
+        <Sidebar isOpen={sidebarOpen} />
+        <main 
+          className={cn(
+            "flex-1 transition-all duration-300 mt-16",
+            sidebarOpen ? "md:ml-64" : "ml-0"
+          )}
+        >
+          <div className="p-6">
+            {children}
+          </div>
+        </main>
       </div>
-    </>
+    </div>
   );
 };
 

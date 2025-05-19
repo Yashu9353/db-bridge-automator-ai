@@ -11,7 +11,7 @@ import {
   HeaderMenu,
   HeaderMenuItem,
 } from "@carbon/react";
-import { Logout } from "@carbon/icons-react"; 
+import { LogOut } from "lucide-react"; // Fixed icon name from Logout to LogOut
 import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import IBMLogo from "../icons/IBMLogo";
@@ -57,9 +57,9 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
       />
       
       <HeaderName prefix="" href="/">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <IBMLogo />
-          <span className="cds--header__name--prefix">Database Migration</span>
+        <div className="flex items-center gap-2">
+          <IBMLogo className="h-6 w-6" />
+          <span className="hidden md:block">Database Migration</span>
         </div>
       </HeaderName>
       
@@ -85,7 +85,7 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
           onClick={handleLogout}
           tooltipAlignment="end"
         >
-          <Logout size={20} />
+          <LogOut size={20} />
         </HeaderGlobalAction>
       </HeaderGlobalBar>
     </CarbonHeader>

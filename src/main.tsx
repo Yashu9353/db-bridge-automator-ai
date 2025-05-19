@@ -1,16 +1,15 @@
 
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import App from "./App";
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+import './carbon-styles.css' // Import Carbon Design System styles
 
-// Import Carbon styles
-import "./main.scss";
+// Import Carbon styles directly
+import '@carbon/styles/css/styles.css'
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
-);
+    <App />
+  </React.StrictMode>,
+)

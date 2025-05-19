@@ -34,59 +34,57 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="cds--grid">
-      <div className="cds--row cds--row--condensed">
-        <div className="cds--col cds--offset-lg-5 cds--col-lg-6 cds--col-md-8 cds--col-sm-4">
-          <div className="cds--tile cds--mt-07">
-            <div className="cds--mb-07">
-              <div className="cds--text-align--center">
-                <IBMLogo className="cds--mb-05" />
-                <h1 className="cds--type-productive-heading-04">
-                  Database Migration
-                </h1>
-              </div>
-              
-              {error && (
-                <InlineNotification
-                  kind="error"
-                  title="Error"
-                  subtitle={error}
-                  hideCloseButton={false}
-                  onClose={() => setError("")}
-                  className="cds--mb-05"
-                />
-              )}
-
-              <Form onSubmit={handleSubmit}>
-                <div className="cds--mb-07">
-                  <FormGroup legendText="">
-                    <TextInput
-                      id="email"
-                      labelText="Email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="cds--mb-05"
-                    />
-                    <TextInput
-                      id="password"
-                      labelText="Password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </FormGroup>
-                  
-                  <Button type="submit" kind="primary" size="md" className="cds--mt-05" style={{ width: '100%' }}>
-                    Log in
-                  </Button>
-                </div>
-              </Form>
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center gap-4">
+            <IBMLogo className="h-10 w-10" />
+            <span className="text-2xl font-bold text-gray-900">
+              Database Migration
+            </span>
           </div>
         </div>
+        
+        {error && (
+          <InlineNotification
+            kind="error"
+            title="Error"
+            subtitle={error}
+            role="alert"
+            onCloseButtonClick={() => setError("")}
+            hideCloseButton={true}
+            style={{ marginBottom: '1rem' }}
+          />
+        )}
+
+        <Form onSubmit={handleSubmit}>
+          <div className="space-y-6">
+            <FormGroup legendText="Login credentials">
+              <TextInput
+                id="email"
+                labelText="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <TextInput
+                id="password"
+                labelText="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </FormGroup>
+            
+            <Button type="submit" kind="primary" size="md" style={{ width: '100%' }}>
+              Log in
+            </Button>
+            
+          
+          </div>
+        </Form>
       </div>
     </div>
   );

@@ -1,40 +1,32 @@
 
 import Layout from "@/components/layout/Layout";
-import { Grid, Column, InlineNotification, FileUploader } from "@carbon/react";
-import { Upload } from "@carbon/icons-react";
-import PageHeader from "@/components/layout/PageHeader";
+import FileUploader from "@/components/migration/FileUploader";
+import { Info } from "lucide-react";
 
 const ScriptUpload = () => {
   return (
     <Layout>
-      <Grid narrow>
-        <Column lg={16} md={8} sm={4}>
-          <PageHeader 
-            title="Upload SQL Scripts"
-            description="Upload SQL, BTEQ, or stored procedure scripts for conversion"
-          />
-          
-          <InlineNotification
-            kind="info"
-            title="Supported File Types"
-            subtitle="You can upload .sql, .bteq, or .txt files containing SQL code. For best results, each file should contain related queries or a single stored procedure."
-            className="cds--mb-05"
-          />
-          
-          <div className="cds--mb-07">
-            <FileUploader
-              labelTitle="Upload SQL Scripts"
-              labelDescription="Drag and drop files here or click to upload"
-              buttonLabel="Add files"
-              filenameStatus="edit"
-              accept={['.sql', '.bteq', '.txt']}
-              multiple={true}
-              iconDescription="Clear file"
-              name="fileUploader"
-            />
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-medium text-carbon-gray-100">Upload SQL Scripts</h1>
+          <p className="text-carbon-gray-70 mt-1">
+            Upload SQL, BTEQ, or stored procedure scripts for conversion
+          </p>
+        </div>
+        
+        <div className="bg-carbon-blue bg-opacity-10 border-l-4 border-carbon-blue p-4 flex items-start gap-3">
+          <Info size={20} className="text-carbon-blue mt-0.5" />
+          <div>
+            <h3 className="font-medium text-carbon-gray-100">Supported File Types</h3>
+            <p className="text-carbon-gray-70 mt-1">
+              You can upload .sql, .bteq, or .txt files containing SQL code. 
+              For best results, each file should contain related queries or a single stored procedure.
+            </p>
           </div>
-        </Column>
-      </Grid>
+        </div>
+        
+        <FileUploader />
+      </div>
     </Layout>
   );
 };

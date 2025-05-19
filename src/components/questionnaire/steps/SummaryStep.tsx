@@ -1,6 +1,4 @@
 
-import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "@carbon/react";
-
 type SummaryStepProps = {
   formData: {
     sourceDb: string;
@@ -14,52 +12,40 @@ type SummaryStepProps = {
 
 const SummaryStep = ({ formData }: SummaryStepProps) => {
   return (
-    <div className="cds--form">
-      <h2 className="cds--type-productive-heading-03 cds--mb-04">Summary</h2>
-      <p className="cds--type-body-long-01 cds--mb-05">Review your migration configuration</p>
+    <div className="space-y-6">
+      <h2 className="text-xl font-medium text-carbon-gray-100">Summary</h2>
+      <p className="text-carbon-gray-70">Review your migration configuration</p>
       
-      <Table size="lg">
-        <TableBody>
-          <TableRow>
-            <TableCell>Source Database</TableCell>
-            <TableCell className="cds--capitalize">
-              {formData.sourceDb || "Not selected"}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Target Database</TableCell>
-            <TableCell className="cds--capitalize">
-              {formData.targetDb || "Not selected"}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Conversion Type</TableCell>
-            <TableCell>
-              {formData.conversionType === "sql" && "SQL Queries & Scripts"}
-              {formData.conversionType === "stored-procedures" && "Stored Procedures"}
-              {formData.conversionType === "both" && "SQL & Stored Procedures"}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Optimization Level</TableCell>
-            <TableCell className="cds--capitalize">
-              {formData.optimizationLevel}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Strict Mode</TableCell>
-            <TableCell>
-              {formData.strictMode ? "Enabled" : "Disabled"}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Use Feedback Database</TableCell>
-            <TableCell>
-              {formData.useFeedbackDb ? "Enabled" : "Disabled"}
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <div className="border border-carbon-gray-30">
+        <div className="grid grid-cols-[1fr,2fr] border-b border-carbon-gray-30">
+          <div className="bg-carbon-gray-10 p-4 font-medium">Source Database</div>
+          <div className="p-4 capitalize">{formData.sourceDb || "Not selected"}</div>
+        </div>
+        <div className="grid grid-cols-[1fr,2fr] border-b border-carbon-gray-30">
+          <div className="bg-carbon-gray-10 p-4 font-medium">Target Database</div>
+          <div className="p-4 capitalize">{formData.targetDb || "Not selected"}</div>
+        </div>
+        <div className="grid grid-cols-[1fr,2fr] border-b border-carbon-gray-30">
+          <div className="bg-carbon-gray-10 p-4 font-medium">Conversion Type</div>
+          <div className="p-4">
+            {formData.conversionType === "sql" && "SQL Queries & Scripts"}
+            {formData.conversionType === "stored-procedures" && "Stored Procedures"}
+            {formData.conversionType === "both" && "SQL & Stored Procedures"}
+          </div>
+        </div>
+        <div className="grid grid-cols-[1fr,2fr] border-b border-carbon-gray-30">
+          <div className="bg-carbon-gray-10 p-4 font-medium">Optimization Level</div>
+          <div className="p-4 capitalize">{formData.optimizationLevel}</div>
+        </div>
+        <div className="grid grid-cols-[1fr,2fr] border-b border-carbon-gray-30">
+          <div className="bg-carbon-gray-10 p-4 font-medium">Strict Mode</div>
+          <div className="p-4">{formData.strictMode ? "Enabled" : "Disabled"}</div>
+        </div>
+        <div className="grid grid-cols-[1fr,2fr]">
+          <div className="bg-carbon-gray-10 p-4 font-medium">Use Feedback Database</div>
+          <div className="p-4">{formData.useFeedbackDb ? "Enabled" : "Disabled"}</div>
+        </div>
+      </div>
     </div>
   );
 };

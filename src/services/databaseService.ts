@@ -7,247 +7,438 @@ export type DatabaseType = 'teradata' | 'oracle' | 'sqlserver' | 'postgresql' | 
 export interface DatabaseConnection {
   id: string;
   name: string;
-  type: DatabaseType;
+  databaseType: DatabaseType;
   host: string;
   port: string;
   database: string;
   username: string;
-  password: string;
+  connected: boolean;
 }
 
-interface ConnectionResult {
-  success: boolean;
-  message?: string;
-}
-
-interface ConversionResult {
+export interface ConversionResult {
+  sourceCode: string;
   targetCode: string;
+  conversionTime: number;
+  successCount: number;
+  warningCount: number;
+  errorCount: number;
   issues: Array<{
     line: number;
     message: string;
     severity: 'warning' | 'error';
     solution?: string;
   }>;
-  successCount: number;
-  warningCount: number;
-  errorCount: number;
 }
 
-// Simulated connections storage
-const connections: {
-  source?: DatabaseConnection;
-  target?: DatabaseConnection;
-} = {};
+// In-memory storage for simulated data (would be stored in the backend database)
+const connections: Record<string, DatabaseConnection> = {};
 
-// Function to get stored database connections
-export const getDatabaseConnections = () => {
-  return connections;
-};
-
-// Simulated function to fetch database schema
-export const fetchDatabaseSchema = async (connectionId: string) => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Mock schema data for demonstration
-  return {
-    schemas: [
-      {
-        name: "SALES",
-        tables: [
-          { name: "CUSTOMERS", columns: ["CUSTOMER_ID", "NAME", "EMAIL", "ADDRESS"] },
-          { name: "ORDERS", columns: ["ORDER_ID", "CUSTOMER_ID", "ORDER_DATE", "AMOUNT"] },
-        ],
-        views: [
-          { name: "CUSTOMER_ORDERS", definition: "SELECT c.NAME, o.ORDER_ID, o.AMOUNT FROM CUSTOMERS c JOIN ORDERS o ON c.CUSTOMER_ID = o.CUSTOMER_ID" }
-        ],
-        procedures: [
-          { name: "GET_CUSTOMER_ORDERS", parameters: ["IN CUSTOMER_ID INTEGER", "OUT RESULT CURSOR"] }
-        ],
-        functions: [
-          { name: "CALCULATE_DISCOUNT", parameters: ["AMOUNT DECIMAL", "CUSTOMER_LEVEL INTEGER"], returnType: "DECIMAL" }
-        ]
-      },
-      {
-        name: "INVENTORY",
-        tables: [
-          { name: "PRODUCTS", columns: ["PRODUCT_ID", "NAME", "PRICE", "QUANTITY"] },
-          { name: "SUPPLIERS", columns: ["SUPPLIER_ID", "NAME", "CONTACT"] }
-        ],
-        views: [],
-        procedures: [],
-        functions: []
-      }
-    ]
-  };
-};
-
-// Simulated function to test a database connection
+// Simulated test connection function - would call Python backend API
 export const testDatabaseConnection = async (
-  connectionType: 'source' | 'target', 
-  connection: Partial<DatabaseConnection> & { type: DatabaseType }
-): Promise<ConnectionResult> => {
-  // Simulate API call delay
+  type: 'source' | 'target',
+  config: {
+    databaseType: DatabaseType;
+    host: string;
+    port: string;
+    database: string;
+    username: string;
+    password: string;
+  }
+): Promise<{ success: boolean; message?: string }> => {
+  // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // This is just a simulation - in a real app this would make an API call
-  const requiredFields = ['host', 'port', 'database', 'username', 'password'];
-  const missingFields = requiredFields.filter(field => !connection[field as keyof typeof connection]);
-  
-  if (missingFields.length > 0) {
-    return {
-      success: false,
-      message: `Missing required fields: ${missingFields.join(', ')}`
+  // Basic validation
+  if (!config.host || !config.database || !config.username || !config.password) {
+    return { 
+      success: false, 
+      message: "All connection fields are required" 
     };
   }
-  
-  // For demo purposes, let's say Teradata connections to localhost:1025 always work
-  if (connection.type === 'teradata' && connection.host === 'localhost' && connection.port === '1025') {
-    return {
-      success: true
+
+  // Simulate different connection results based on inputs
+  if (config.host === 'localhost' || config.host.includes('127.0.0.1')) {
+    // Local connections always work in our simulation
+    const id = `${type}-${Date.now()}`;
+    connections[id] = {
+      id,
+      name: config.database,
+      databaseType: config.databaseType,
+      host: config.host,
+      port: config.port,
+      database: config.database,
+      username: config.username,
+      connected: true
+    };
+    return { success: true };
+  } else if (config.host.includes('example') || config.host.includes('test')) {
+    // Example/test hosts always fail in our simulation
+    return { 
+      success: false, 
+      message: "Could not establish connection to the database server" 
+    };
+  } else {
+    // Other hosts have an 80% success rate
+    const success = Math.random() < 0.8;
+    
+    if (success) {
+      const id = `${type}-${Date.now()}`;
+      connections[id] = {
+        id,
+        name: config.database,
+        databaseType: config.databaseType,
+        host: config.host,
+        port: config.port,
+        database: config.database,
+        username: config.username,
+        connected: true
+      };
+    }
+    
+    return { 
+      success, 
+      message: success ? undefined : "Connection timed out" 
     };
   }
-  
-  // For demo purposes, let's say DB2 connections to localhost:50000 always work
-  if (connection.type?.startsWith('db2') && connection.host === 'localhost' && connection.port === '50000') {
-    return {
-      success: true
-    };
-  }
-  
-  // Otherwise randomly succeed or fail for demo purposes
-  const randomSuccess = Math.random() > 0.3;
-  
-  return {
-    success: randomSuccess,
-    message: randomSuccess ? undefined : `Connection failed: ${
-      Math.random() > 0.5 
-        ? 'Network error' 
-        : 'Authentication failed'
-    }`
-  };
 };
 
-// Simulated function to convert SQL syntax between dialects
+// Get active database connections
+export const getDatabaseConnections = (): { 
+  source?: DatabaseConnection; 
+  target?: DatabaseConnection 
+} => {
+  let source, target;
+  
+  // Find source and target connections
+  Object.values(connections).forEach(conn => {
+    if (conn.id.startsWith('source-')) source = conn;
+    if (conn.id.startsWith('target-')) target = conn;
+  });
+  
+  return { source, target };
+};
+
+// Simulated Python sqlglot processing using antlr4-based parser logic
 export const convertSqlSyntax = async (
-  sourceCode: string,
+  source: string,
   sourceType: DatabaseType,
-  targetType: 'db2'
+  targetType: DatabaseType
 ): Promise<ConversionResult> => {
-  // Simulate API call delay
+  // Simulate processing time
   await new Promise(resolve => setTimeout(resolve, 2000));
   
-  let convertedCode = sourceCode;
-  const issues: ConversionResult['issues'] = [];
+  // This would use the Python parser in a real implementation
+  // We're simulating the ANTLR4 parser output
+  let targetCode = source;
+  const issues = [];
   
-  // For demo: Detect and convert Teradata's SEL to SELECT
-  if (sourceCode.toLowerCase().includes('sel ')) {
-    convertedCode = convertedCode.replace(/sel /gi, 'SELECT ');
-    issues.push({
-      line: sourceCode.toLowerCase().split('\n').findIndex(line => 
-        line.toLowerCase().trim().startsWith('sel ')) + 1,
-      message: "SEL abbreviation is not supported in Db2, changed to SELECT",
-      severity: 'warning',
-      solution: "Check that the SELECT statement is correctly formatted"
-    });
-  }
-  
-  // For demo: Convert Teradata's DATE syntax
-  if (sourceCode.includes("DATE '")) {
-    convertedCode = convertedCode.replace(/DATE '([^']+)'/g, "DATE('$1')");
-    issues.push({
-      line: sourceCode.split('\n').findIndex(line => 
-        line.includes("DATE '")) + 1,
-      message: "Teradata DATE literal format converted to DB2 format",
-      severity: 'warning',
-      solution: "Review the DATE function conversion for accuracy"
-    });
-  }
-  
-  // For demo: Handle QUALIFY keyword (complex conversion)
-  if (sourceCode.toLowerCase().includes('qualify')) {
-    // This is a very simplified conversion - a real parser would do this properly
-    const qualifyLine = sourceCode.toLowerCase().split('\n').findIndex(line => 
-      line.toLowerCase().includes('qualify'));
+  // Very basic teradata to DB2 conversions simulating the parser logic
+  if (sourceType === 'teradata' && targetType.includes('db2')) {
+    // SEL to SELECT conversion
+    if (targetCode.toLowerCase().includes('sel ')) {
+      const lineIndex = targetCode.toLowerCase().split('\n').findIndex(line => 
+        line.toLowerCase().trim().startsWith('sel '));
+      
+      issues.push({
+        line: lineIndex + 1,
+        message: "SEL abbreviation is not supported in Db2, use SELECT instead",
+        severity: 'warning',
+        solution: "Converted SEL to SELECT"
+      });
+      
+      targetCode = targetCode.replace(/\bSEL\b/gi, "SELECT");
+    }
     
-    convertedCode = convertedCode.replace(
-      /QUALIFY\s+ROW_NUMBER\(\)\s+OVER\s+\(PARTITION BY\s+([^\s]+)\s+ORDER BY\s+([^\s]+)(?:\s+([^\s]+))?\)\s+=\s+1/gi,
-      `AND (\n  SELECT COUNT(*) \n  FROM order_db.orders b2 \n  WHERE b2.customer_id = $1 \n  AND (b2.order_date {'>'} $2 OR \n      (b2.order_date = $2 AND b2.order_id {'>'} b.order_id))\n) = 0`
-    );
+    // Replace QUALIFY with row_number() in a subquery
+    if (targetCode.toLowerCase().includes('qualify')) {
+      const lineIndex = targetCode.toLowerCase().split('\n').findIndex(line => 
+        line.toLowerCase().includes('qualify'));
+      
+      issues.push({
+        line: lineIndex + 1,
+        message: "QUALIFY is not supported in IBM Db2",
+        severity: 'error',
+        solution: "Converted to standard SQL with ROW_NUMBER()"
+      });
+      
+      // Attempt to match and transform QUALIFY pattern
+      // This is a simplified simulation of what the Python parser would do
+      const qualifyRegex = /QUALIFY\s+ROW_NUMBER\(\)\s+OVER\s+\(PARTITION\s+BY\s+([^\)]+)\s+ORDER\s+BY\s+([^\)]+)\)\s*=\s*1/i;
+      const match = targetCode.match(qualifyRegex);
+      
+      if (match) {
+        const partitionBy = match[1];
+        const orderBy = match[2];
+        
+        // Extract the table and column names from the order by
+        const orderParts = orderBy.split('.');
+        let tableAlias = "";
+        
+        if (orderParts.length > 1) {
+          tableAlias = orderParts[0].trim();
+        }
+        
+        // Create a replacement subquery
+        const replacement = `AND (
+  SELECT COUNT(*) 
+  FROM ${tableAlias ? tableAlias.split('.')[0] + '.' : ''}orders b2 
+  WHERE b2.${partitionBy.includes('.') ? partitionBy.split('.')[1] : partitionBy} = ${
+    partitionBy.includes('.') ? partitionBy : 'a.' + partitionBy
+  } 
+  AND (b2.${orderBy.split(' ')[0]} > ${
+    orderBy.includes('.') ? orderBy.split(' ')[0] : 'a.' + orderBy.split(' ')[0]
+  } OR 
+      (b2.${orderBy.split(' ')[0]} = ${
+    orderBy.includes('.') ? orderBy.split(' ')[0] : 'a.' + orderBy.split(' ')[0]
+  } AND b2.order_id > ${
+    tableAlias ? tableAlias + '.order_id' : 'a.order_id'
+  }))
+) = 0`;
+
+        // Replace the QUALIFY clause with the subquery
+        targetCode = targetCode.replace(qualifyRegex, replacement);
+      } else {
+        // Generic replacement if regex doesn't match
+        targetCode = targetCode.replace(/QUALIFY\s+ROW_NUMBER\(\)\s+OVER\s+\(([^)]+)\)\s*=\s*1/gi, 
+          `AND (
+  SELECT COUNT(*) 
+  FROM table_alias b2 
+  WHERE b2.key = a.key 
+  AND (b2.order_col > a.order_col OR 
+      (b2.order_col = a.order_col AND b2.id > a.id))
+) = 0`);
+      }
+    }
     
-    issues.push({
-      line: qualifyLine + 1,
-      message: "QUALIFY clause is not supported in Db2, converted to equivalent subquery",
-      severity: 'warning',
-      solution: "Verify the generated subquery logic matches the original QUALIFY intent"
-    });
+    // Replace DATE syntax
+    if (targetCode.includes("DATE '")) {
+      issues.push({
+        line: targetCode.split('\n').findIndex(line => line.includes("DATE '")) + 1,
+        message: "DATE literal format differs in Db2",
+        severity: 'warning',
+        solution: "Converted to DATE() function format"
+      });
+      
+      targetCode = targetCode.replace(/DATE\s+'([^']+)'/gi, "DATE('$1')");
+    }
+    
+    // Add warnings for potential issues
+    if (targetCode.includes('.')) {
+      issues.push({
+        line: targetCode.split('\n').findIndex(line => line.includes('.')) + 1,
+        message: "Table references may require schema qualification in Db2",
+        severity: 'warning',
+        solution: "Verify schema names in the target database"
+      });
+    }
+    
+    // Simulated ANTLR parser messages for Teradata syntax
+    if (source.toLowerCase().includes('join')) {
+      console.log("Python parser: Found JOIN clause in Teradata SQL");
+    }
+    
+    if (source.toLowerCase().includes('where')) {
+      console.log("Python parser: Found WHERE clause in Teradata SQL");
+    }
   }
   
-  // Count severity types
-  const warningCount = issues.filter(issue => issue.severity === 'warning').length;
-  const errorCount = issues.filter(issue => issue.severity === 'error').length;
+  // Calculate counts for reporting
+  const successCount = targetCode !== source ? 1 : 0;
+  const warningCount = issues.filter(i => i.severity === 'warning').length;
+  const errorCount = issues.filter(i => i.severity === 'error').length;
   
   return {
-    targetCode: convertedCode,
-    issues,
-    successCount: 1, // Assuming single SQL statement for demo
+    sourceCode: source,
+    targetCode,
+    conversionTime: Math.random() * 1000 + 500, // Simulated conversion time in ms
+    successCount,
     warningCount,
-    errorCount
+    errorCount,
+    issues
   };
 };
 
-// Function to download SQL file
-export const downloadSqlFile = (sqlContent: string, filename: string): void => {
-  const blob = new Blob([sqlContent], { type: 'text/plain' });
+// Function to download a file (client-side functionality)
+export const downloadSqlFile = (content: string, filename: string = 'converted_script.sql') => {
+  const blob = new Blob([content], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 0);
 };
 
-// Function to process SQL file uploads
+// Simulated schema browser data - would come from actual database connections
+export const fetchDatabaseSchema = async (connectionId: string): Promise<any> => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Return mock schema data
+  return {
+    schemas: [
+      {
+        name: "SALES",
+        tables: [
+          { name: "CUSTOMERS", columns: ["CUSTOMER_ID", "NAME", "EMAIL", "ADDRESS"] },
+          { name: "ORDERS", columns: ["ORDER_ID", "CUSTOMER_ID", "ORDER_DATE", "TOTAL"] },
+          { name: "PRODUCTS", columns: ["PRODUCT_ID", "NAME", "PRICE", "CATEGORY"] }
+        ],
+        views: [
+          { name: "CUSTOMER_ORDERS", definition: "SELECT c.NAME, o.ORDER_ID, o.ORDER_DATE FROM CUSTOMERS c JOIN ORDERS o ON c.CUSTOMER_ID = o.CUSTOMER_ID" }
+        ],
+        procedures: [
+          { name: "UPDATE_INVENTORY", parameters: ["PRODUCT_ID INT", "QUANTITY INT"] }
+        ],
+        functions: [
+          { name: "CALCULATE_DISCOUNT", parameters: ["PRICE DECIMAL", "CUSTOMER_TIER INT"], returnType: "DECIMAL" }
+        ]
+      },
+      {
+        name: "HR",
+        tables: [
+          { name: "EMPLOYEES", columns: ["EMPLOYEE_ID", "NAME", "POSITION", "SALARY"] },
+          { name: "DEPARTMENTS", columns: ["DEPARTMENT_ID", "NAME", "MANAGER_ID"] }
+        ],
+        views: [
+          { name: "DEPARTMENT_SUMMARY", definition: "SELECT d.NAME, COUNT(e.EMPLOYEE_ID) as EMP_COUNT FROM DEPARTMENTS d JOIN EMPLOYEES e ON d.DEPARTMENT_ID = e.DEPARTMENT_ID GROUP BY d.NAME" }
+        ],
+        procedures: [
+          { name: "HIRE_EMPLOYEE", parameters: ["NAME VARCHAR(100)", "POSITION VARCHAR(50)", "SALARY DECIMAL"] }
+        ],
+        functions: [
+          { name: "GET_MANAGER_NAME", parameters: ["DEPT_ID INT"], returnType: "VARCHAR(100)" }
+        ]
+      }
+    ]
+  };
+};
+
+// Upload and process SQL scripts
 export const processSqlFile = async (file: File): Promise<{
+  id: string;
+  name: string;
+  size: number;
+  content: string;
   status: 'success' | 'error';
-  content?: string;
   error?: string;
 }> => {
-  // Simulate processing delay
-  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-  
-  try {
-    // Read the file content
-    const content = await readFileAsText(file);
-    
-    // For demo purposes, randomly fail some files
-    if (Math.random() > 0.9) {
-      return {
-        status: 'error',
-        error: 'Invalid SQL syntax detected'
-      };
-    }
-    
-    return {
-      status: 'success',
-      content
-    };
-  } catch (error) {
-    return {
-      status: 'error',
-      error: 'Failed to read file content'
-    };
-  }
-};
-
-// Helper function to read file content
-const readFileAsText = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    
+    reader.onload = async (e) => {
+      try {
+        // Simulate backend processing
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500));
+        
+        const content = e.target?.result as string;
+        
+        // Simulated Python parser analysis
+        if (content.toLowerCase().includes('sel ') || content.toLowerCase().includes('qualify')) {
+          console.log("Python TeradataSQL parser detected Teradata SQL syntax");
+          
+          // Log the parser output similar to Python sample code
+          if (content.toLowerCase().includes('sel ')) {
+            console.log("Found SELECT Statement:", content.split('\n').find(line => 
+              line.toLowerCase().includes('sel ')));
+          }
+          
+          if (content.toLowerCase().includes('qualify')) {
+            console.log("Found QUALIFY clause:", content.split('\n').find(line => 
+              line.toLowerCase().includes('qualify')));
+          }
+        }
+        
+        // Simple validation - in real app this would be done by the Python backend
+        const hasError = Math.random() < 0.2 || content.includes('INVALID_SYNTAX');
+        
+        resolve({
+          id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: file.name,
+          size: file.size,
+          content,
+          status: hasError ? 'error' : 'success',
+          error: hasError ? 'Invalid SQL syntax detected' : undefined
+        });
+      } catch (error) {
+        reject(error);
+      }
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+    
     reader.readAsText(file);
   });
+};
+
+// This function simulates parsing a script with the ANTLR4 TeradataSQL parser
+export const parseTeradataScript = (sql: string): string[] => {
+  // This would be a real call to Python backend in production
+  // For now, we'll simulate the output of the parser
+  
+  const parsedSegments: string[] = [];
+  
+  // Check for select statements (SEL in Teradata)
+  if (sql.toLowerCase().match(/\bsel\b|\bselect\b/g)) {
+    parsedSegments.push("Found SELECT Statement");
+  }
+  
+  // Check for QUALIFY clause
+  if (sql.toLowerCase().includes('qualify')) {
+    parsedSegments.push("Found QUALIFY clause - will require conversion for Db2");
+  }
+  
+  // Check for specific Teradata syntax
+  if (sql.toLowerCase().includes('collect stats')) {
+    parsedSegments.push("Found COLLECT STATS - no direct equivalent in Db2");
+  }
+  
+  // Check for Teradata specific datatypes
+  if (sql.toLowerCase().includes('byteint') || sql.toLowerCase().includes('timestamp(6)')) {
+    parsedSegments.push("Found Teradata-specific datatypes");
+  }
+  
+  // If no Teradata specific features found
+  if (parsedSegments.length === 0) {
+    parsedSegments.push("No Teradata-specific syntax found");
+  }
+  
+  return parsedSegments;
+};
+
+// This function would implement the logic from the Python parser for DB2 conversion
+export const simulateTeradataToDb2Conversion = (sql: string): string => {
+  let convertedSql = sql;
+  
+  // Replace SEL with SELECT
+  convertedSql = convertedSql.replace(/\bSEL\b/gi, "SELECT");
+  
+  // Replace DATE literals
+  convertedSql = convertedSql.replace(/DATE\s+'([^']+)'/gi, "DATE('$1')");
+  
+  // Replace QUALIFY clauses
+  // This is a simplified approach; a real parser would handle this more precisely
+  if (convertedSql.toLowerCase().includes('qualify')) {
+    // Find the table alias used in the QUALIFY clause
+    const tableMatches = sql.match(/from\s+(\w+)(?:\.\w+)?\s+([a-zA-Z][a-zA-Z0-9_]*)/i);
+    const tableAlias = tableMatches ? tableMatches[2] : 'a';
+    
+    // Replace QUALIFY with a subquery
+    convertedSql = convertedSql.replace(/QUALIFY\s+ROW_NUMBER\(\)\s+OVER\s+\(PARTITION\s+BY\s+([^\)]+)\s+ORDER\s+BY\s+([^\)]+)\)\s*=\s*1/gi, 
+      `AND NOT EXISTS (
+  SELECT 1
+  FROM ${tableMatches ? tableMatches[1] + (tableMatches[2] ? '.' + tableMatches[2] : '') : 'table'} b
+  WHERE b.$1 = ${tableAlias}.$1
+  AND (b.$2 > ${tableAlias}.$2 OR (b.$2 = ${tableAlias}.$2 AND b.id > ${tableAlias}.id))
+)`);
+  }
+  
+  // Additional Teradata to DB2 conversions would go here
+  
+  return convertedSql;
 };

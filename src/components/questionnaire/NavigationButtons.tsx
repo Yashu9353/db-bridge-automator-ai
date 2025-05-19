@@ -1,6 +1,6 @@
 
-import { Button } from "@carbon/react";
-import { ArrowLeft, ArrowRight } from "@carbon/icons-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FormData } from "./constants/steps";
 
@@ -23,29 +23,30 @@ const NavigationButtons = ({ currentStep, stepsCount, nextStep, prevStep, formDa
   };
   
   return (
-    <div className="cds--btn-set cds--btn-set--stacked cds--mt-07">
+    <div className="flex justify-between mt-8">
       <Button
-        kind="secondary"
+        type="button"
         onClick={prevStep}
+        className="carbon-button-secondary"
         disabled={currentStep === 0}
-        renderIcon={ArrowLeft}
-        iconDescription="Previous"
       >
+        <ArrowLeft size={16} className="mr-2" />
         Previous
       </Button>
       
       {currentStep < stepsCount - 1 ? (
         <Button
-          kind="primary"
+          type="button"
           onClick={nextStep}
-          renderIcon={ArrowRight}
-          iconDescription="Next"
+          className="carbon-button-primary"
         >
           Next
+          <ArrowRight size={16} className="ml-2" />
         </Button>
       ) : (
         <Button
-          kind="primary"
+          type="button"
+          className="carbon-button-primary"
           onClick={handleSubmit}
         >
           Start Migration

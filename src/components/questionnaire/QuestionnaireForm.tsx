@@ -7,7 +7,6 @@ import ConversionTypeStep from "./steps/ConversionTypeStep";
 import PreferencesStep from "./steps/PreferencesStep";
 import SummaryStep from "./steps/SummaryStep";
 import NavigationButtons from "./NavigationButtons";
-import { Grid, Column } from "@carbon/react";
 
 type QuestionnaireFormProps = {
   questionnaireId?: string;
@@ -39,10 +38,6 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const updateStepData = (data: any) => {
-    setFormData(prev => ({ ...prev, ...data }));
-  };
-
   const nextStep = () => {
     setCurrentStep((prev) => Math.min(prev + 1, questionnaireSteps.length - 1));
   };
@@ -52,14 +47,15 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
   };
 
   return (
-    <Grid narrow className="cds--grid--full-width">
-      <Column lg={12} md={8} sm={4} className="cds--offset-lg-2">
-        <StepIndicator steps={questionnaireSteps} currentStep={currentStep} />
+    <div className="max-w-3xl mx-auto">
+      <StepIndicator steps={questionnaireSteps} currentStep={currentStep} />
 
+      <div>
         {currentStep === 0 && (
           <SourceTargetStep 
-            stepData={formData}
-            updateStepData={updateStepData}
+            sourceDb={formData.sourceDb}
+            targetDb={formData.targetDb}
+            updateFormData={updateFormData}
           />
         )}
 
@@ -72,8 +68,10 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
 
         {currentStep === 2 && (
           <PreferencesStep 
-            stepData={formData}
-            updateStepData={updateStepData}
+            optimizationLevel={formData.optimizationLevel}
+            strictMode={formData.strictMode}
+            useFeedbackDb={formData.useFeedbackDb}
+            updateFormData={updateFormData}
           />
         )}
 
@@ -88,8 +86,8 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
           prevStep={prevStep}
           formData={formData}
         />
-      </Column>
-    </Grid>
+      </div>
+    </div>
   );
 };
 

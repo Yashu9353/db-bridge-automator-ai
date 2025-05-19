@@ -11,11 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@carbon/colors": "^11.33.0",
-    "@carbon/icons-react": "^11.60.0",
-    "@carbon/react": "^1.37.0",
+    "@carbon/react": "^1.41.0",
     "@carbon/styles": "^1.81.0",
-    "@carbon/themes": "^11.19.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",

@@ -1,6 +1,4 @@
 
-import { Progress } from "@/components/ui/progress";
-
 type Step = {
   title: string;
   description: string;
@@ -12,31 +10,38 @@ type StepIndicatorProps = {
 };
 
 const StepIndicator = ({ steps, currentStep }: StepIndicatorProps) => {
-  // Calculate progress percentage
-  const progressPercentage = ((currentStep + 1) / steps.length) * 100;
-  
   return (
-    <div className="cds--mb-07">
-      <div className="cds--mb-03">
-        <strong className="cds--type-productive-heading-02">
-          Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
-        </strong>
-        <p className="cds--type-body-short-01 cds--mt-02">
-          {steps[currentStep].description}
-        </p>
-      </div>
-      
-      <Progress value={progressPercentage} className="h-2" />
-      
-      <div className="cds--progress-step-button-container cds--mt-03">
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
         {steps.map((step, index) => (
           <div 
-            key={index}
-            className={`cds--progress-step-button ${index === currentStep ? 'cds--progress-step-button--current' : ''} ${index < currentStep ? 'cds--progress-step-button--complete' : ''}`}
+            key={index} 
+            className="flex flex-col items-center"
+            style={{ width: `${100 / steps.length}%` }}
           >
-            <span className="cds--progress-step-label">{step.title}</span>
+            <div 
+              className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
+                index === currentStep
+                  ? "bg-carbon-blue text-white"
+                  : index < currentStep
+                  ? "bg-carbon-success text-white"
+                  : "bg-carbon-gray-20 text-carbon-gray-60"
+              }`}
+            >
+              {index + 1}
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-carbon-gray-90">{step.title}</p>
+              <p className="text-xs text-carbon-gray-60 hidden md:block">{step.description}</p>
+            </div>
           </div>
         ))}
+      </div>
+      <div className="relative h-1 bg-carbon-gray-20">
+        <div 
+          className="absolute left-0 top-0 h-full bg-carbon-blue transition-all" 
+          style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+        ></div>
       </div>
     </div>
   );
