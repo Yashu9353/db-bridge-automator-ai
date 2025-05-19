@@ -6,7 +6,6 @@ import {
   TextInput,
   Button,
   InlineNotification,
-  Stack,
 } from "@carbon/react";
 import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
@@ -39,9 +38,9 @@ const LoginForm = () => {
       <div className="cds--row cds--row--condensed">
         <div className="cds--col cds--offset-lg-5 cds--col-lg-6 cds--col-md-8 cds--col-sm-4">
           <div className="cds--tile cds--mt-07">
-            <Stack gap={7}>
+            <div className="cds--mb-07">
               <div className="cds--text-align--center">
-                <IBMLogo className="cds--mb-05" style={{ height: '48px', width: '48px' }} />
+                <IBMLogo className="cds--mb-05" />
                 <h1 className="cds--type-productive-heading-04">
                   Database Migration
                 </h1>
@@ -53,13 +52,13 @@ const LoginForm = () => {
                   title="Error"
                   subtitle={error}
                   hideCloseButton={false}
-                  onCloseButtonClick={() => setError("")}
+                  onClose={() => setError("")}
                   className="cds--mb-05"
                 />
               )}
 
               <Form onSubmit={handleSubmit}>
-                <Stack gap={7}>
+                <div className="cds--mb-07">
                   <FormGroup legendText="">
                     <TextInput
                       id="email"
@@ -80,12 +79,12 @@ const LoginForm = () => {
                     />
                   </FormGroup>
                   
-                  <Button type="submit" kind="primary" size="md" style={{ width: '100%' }}>
+                  <Button type="submit" kind="primary" size="md" className="cds--mt-05" style={{ width: '100%' }}>
                     Log in
                   </Button>
-                </Stack>
+                </div>
               </Form>
-            </Stack>
+            </div>
           </div>
         </div>
       </div>

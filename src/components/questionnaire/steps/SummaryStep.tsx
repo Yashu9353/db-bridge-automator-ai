@@ -1,5 +1,5 @@
 
-import { StructuredListWrapper, StructuredListHead, StructuredListRow, StructuredListCell, StructuredListBody } from "@carbon/react";
+import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "@carbon/react";
 
 type SummaryStepProps = {
   formData: {
@@ -18,48 +18,48 @@ const SummaryStep = ({ formData }: SummaryStepProps) => {
       <h2 className="cds--type-productive-heading-03 cds--mb-04">Summary</h2>
       <p className="cds--type-body-long-01 cds--mb-05">Review your migration configuration</p>
       
-      <StructuredListWrapper>
-        <StructuredListBody>
-          <StructuredListRow>
-            <StructuredListCell noWrap>Source Database</StructuredListCell>
-            <StructuredListCell className="cds--capitalize">
+      <Table size="lg">
+        <TableBody>
+          <TableRow>
+            <TableCell>Source Database</TableCell>
+            <TableCell className="cds--capitalize">
               {formData.sourceDb || "Not selected"}
-            </StructuredListCell>
-          </StructuredListRow>
-          <StructuredListRow>
-            <StructuredListCell noWrap>Target Database</StructuredListCell>
-            <StructuredListCell className="cds--capitalize">
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Target Database</TableCell>
+            <TableCell className="cds--capitalize">
               {formData.targetDb || "Not selected"}
-            </StructuredListCell>
-          </StructuredListRow>
-          <StructuredListRow>
-            <StructuredListCell noWrap>Conversion Type</StructuredListCell>
-            <StructuredListCell>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Conversion Type</TableCell>
+            <TableCell>
               {formData.conversionType === "sql" && "SQL Queries & Scripts"}
               {formData.conversionType === "stored-procedures" && "Stored Procedures"}
               {formData.conversionType === "both" && "SQL & Stored Procedures"}
-            </StructuredListCell>
-          </StructuredListRow>
-          <StructuredListRow>
-            <StructuredListCell noWrap>Optimization Level</StructuredListCell>
-            <StructuredListCell className="cds--capitalize">
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Optimization Level</TableCell>
+            <TableCell className="cds--capitalize">
               {formData.optimizationLevel}
-            </StructuredListCell>
-          </StructuredListRow>
-          <StructuredListRow>
-            <StructuredListCell noWrap>Strict Mode</StructuredListCell>
-            <StructuredListCell>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Strict Mode</TableCell>
+            <TableCell>
               {formData.strictMode ? "Enabled" : "Disabled"}
-            </StructuredListCell>
-          </StructuredListRow>
-          <StructuredListRow>
-            <StructuredListCell noWrap>Use Feedback Database</StructuredListCell>
-            <StructuredListCell>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Use Feedback Database</TableCell>
+            <TableCell>
               {formData.useFeedbackDb ? "Enabled" : "Disabled"}
-            </StructuredListCell>
-          </StructuredListRow>
-        </StructuredListBody>
-      </StructuredListWrapper>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </div>
   );
 };

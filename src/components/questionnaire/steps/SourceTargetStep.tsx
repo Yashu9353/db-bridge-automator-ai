@@ -1,5 +1,5 @@
 
-import { FormLabel, Select, SelectItem, Stack } from "@carbon/react";
+import { FormLabel, Select, SelectItem } from "@carbon/react";
 
 type SourceTargetStepProps = {
   sourceDb: string;
@@ -13,15 +13,13 @@ const SourceTargetStep = ({ sourceDb, targetDb, updateFormData }: SourceTargetSt
       <h2 className="cds--type-productive-heading-03 cds--mb-04">Source & Target Database</h2>
       <p className="cds--type-body-long-01 cds--mb-05">Select your source database type and target IBM database</p>
       
-      <Stack gap={7}>
-        <div>
+      <div className="cds--mb-07">
+        <div className="cds--mb-05">
           <FormLabel>Source Database</FormLabel>
           <Select
             id="sourceDb"
-            labelText=""
-            value={sourceDb}
+            defaultValue={sourceDb}
             onChange={(e) => updateFormData("sourceDb", e.target.value)}
-            className="cds--mb-05"
           >
             <SelectItem value="" text="Select source database" disabled hidden />
             <SelectItem value="teradata" text="Teradata" />
@@ -32,12 +30,11 @@ const SourceTargetStep = ({ sourceDb, targetDb, updateFormData }: SourceTargetSt
           </Select>
         </div>
         
-        <div>
+        <div className="cds--mb-05">
           <FormLabel>Target Database</FormLabel>
           <Select
             id="targetDb"
-            labelText=""
-            value={targetDb}
+            defaultValue={targetDb}
             onChange={(e) => updateFormData("targetDb", e.target.value)}
           >
             <SelectItem value="" text="Select target database" disabled hidden />
@@ -46,7 +43,7 @@ const SourceTargetStep = ({ sourceDb, targetDb, updateFormData }: SourceTargetSt
             <SelectItem value="db2-warehouse" text="IBM Db2 Warehouse" />
           </Select>
         </div>
-      </Stack>
+      </div>
     </div>
   );
 };

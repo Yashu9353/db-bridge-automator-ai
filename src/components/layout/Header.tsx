@@ -58,7 +58,7 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
       
       <HeaderName prefix="" href="/">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <IBMLogo style={{ height: '24px', width: '24px' }} />
+          <IBMLogo />
           <span className="cds--header__name--prefix">Database Migration</span>
         </div>
       </HeaderName>

@@ -3,7 +3,6 @@ import {
   FormLabel, 
   Select, 
   SelectItem, 
-  Stack, 
   Toggle, 
   Tile 
 } from "@carbon/react";
@@ -21,13 +20,12 @@ const PreferencesStep = ({ optimizationLevel, strictMode, useFeedbackDb, updateF
       <h2 className="cds--type-productive-heading-03 cds--mb-04">Preferences</h2>
       <p className="cds--type-body-long-01 cds--mb-05">Configure your conversion preferences</p>
       
-      <Stack gap={7}>
+      <div className="cds--mb-07">
         <div>
           <FormLabel>Optimization Level</FormLabel>
           <Select
             id="optimizationLevel"
-            labelText=""
-            value={optimizationLevel}
+            defaultValue={optimizationLevel}
             onChange={(e) => updateFormData("optimizationLevel", e.target.value)}
             className="cds--mb-05"
           >
@@ -76,7 +74,7 @@ const PreferencesStep = ({ optimizationLevel, strictMode, useFeedbackDb, updateF
             </div>
           </div>
         </Tile>
-      </Stack>
+      </div>
     </div>
   );
 };

@@ -17,7 +17,6 @@ const ScriptUpload = () => {
             kind="info"
             title="Supported File Types"
             subtitle="You can upload .sql, .bteq, or .txt files containing SQL code. For best results, each file should contain related queries or a single stored procedure."
-            iconDescription="Info"
             className="cds--mb-05"
           />
           

@@ -5,30 +5,18 @@ import {
   HeaderContainer,
   HeaderName,
   HeaderNavigation,
-  HeaderMenuButton,
   HeaderMenuItem,
   HeaderGlobalBar,
   HeaderGlobalAction,
   SkipToContent,
-  SideNav,
-  SideNavItems,
-  SideNavLink,
-  SideNavMenu,
-  SideNavMenuItem,
   Content
 } from "@carbon/react";
 import {
-  Home,
-  DataBase,
-  DocumentAdd,
-  Play,
-  CheckmarkOutline,
-  WarningAlt,
-  ChartLineData,
   Settings,
   User,
   Logout
 } from "@carbon/icons-react";
+import Sidebar from "./Sidebar";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -44,11 +32,6 @@ const Layout = ({ children }: LayoutProps) => {
           <>
             <Header aria-label="IBM Database Migration">
               <SkipToContent />
-              <HeaderMenuButton
-                aria-label="Open menu"
-                onClick={() => setIsSideNavExpanded(!isSideNavExpanded)}
-                isActive={isSideNavExpanded}
-              />
               <HeaderName href="/" prefix="">
                 IBM Database Migration
               </HeaderName>
@@ -68,57 +51,16 @@ const Layout = ({ children }: LayoutProps) => {
                   <Logout size={20} />
                 </HeaderGlobalAction>
               </HeaderGlobalBar>
-              
-              <SideNav 
-                aria-label="Side navigation" 
-                expanded={isSideNavExpanded}
-                isChildOfHeader
-                isPersistent
-              >
-                <SideNavItems>
-                  <SideNavLink renderIcon={Home} href="/">
-                    Dashboard
-                  </SideNavLink>
-                  <SideNavMenu renderIcon={DataBase} title="Database">
-                    <SideNavMenuItem href="/database/connections">
-                      Connections
-                    </SideNavMenuItem>
-                    <SideNavMenuItem href="/database/schema">
-                      Schema Browser
-                    </SideNavMenuItem>
-                  </SideNavMenu>
-                  <SideNavMenu renderIcon={DocumentAdd} title="SQL Scripts">
-                    <SideNavMenuItem href="/scripts/manage">
-                      Manage Scripts
-                    </SideNavMenuItem>
-                    <SideNavMenuItem href="/scripts/upload">
-                      Upload Scripts
-                    </SideNavMenuItem>
-                  </SideNavMenu>
-                  <SideNavLink renderIcon={Play} href="/run">
-                    Run Migrations
-                  </SideNavLink>
-                  <SideNavLink renderIcon={CheckmarkOutline} href="/validation">
-                    Validation Results
-                  </SideNavLink>
-                  <SideNavLink renderIcon={WarningAlt} href="/issues">
-                    Issues & Fixes
-                  </SideNavLink>
-                  <SideNavLink renderIcon={ChartLineData} href="/reports">
-                    Reports
-                  </SideNavLink>
-                  <SideNavLink renderIcon={Settings} href="/settings">
-                    Settings
-                  </SideNavLink>
-                </SideNavItems>
-              </SideNav>
             </Header>
           </>
         )}
       />
-      <Content className={isSideNavExpanded ? 'cds--content--expanded' : ''}>
-        {children}
-      </Content>
+      <div className="cds--side-nav-container">
+        <Sidebar isOpen={isSideNavExpanded} />
+        <Content className={isSideNavExpanded ? 'cds--content--expanded' : ''}>
+          {children}
+        </Content>
+      </div>
     </>
   );
 };
