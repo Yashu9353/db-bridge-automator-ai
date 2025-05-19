@@ -7,6 +7,7 @@ import ConversionTypeStep from "./steps/ConversionTypeStep";
 import PreferencesStep from "./steps/PreferencesStep";
 import SummaryStep from "./steps/SummaryStep";
 import NavigationButtons from "./NavigationButtons";
+import { Grid, Column } from "@carbon/react";
 
 type QuestionnaireFormProps = {
   questionnaireId?: string;
@@ -47,10 +48,10 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <StepIndicator steps={questionnaireSteps} currentStep={currentStep} />
+    <Grid narrow className="cds--grid--full-width">
+      <Column lg={12} md={8} sm={4} className="cds--offset-lg-2">
+        <StepIndicator steps={questionnaireSteps} currentStep={currentStep} />
 
-      <div>
         {currentStep === 0 && (
           <SourceTargetStep 
             sourceDb={formData.sourceDb}
@@ -86,8 +87,8 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
           prevStep={prevStep}
           formData={formData}
         />
-      </div>
-    </div>
+      </Column>
+    </Grid>
   );
 };
 

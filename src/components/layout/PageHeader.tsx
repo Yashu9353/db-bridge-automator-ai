@@ -14,18 +14,18 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   actions 
 }) => {
   return (
-    <Grid fullWidth className="page-header">
+    <Grid fullWidth className="cds--mb-05">
       <Column lg={10} md={4} sm={4}>
-        <h1 className="text-productive-heading-04">{title}</h1>
+        <h1 className="cds--type-productive-heading-04">{title}</h1>
         {description && (
-          <p className="text-body-short-01 text-text-secondary mt-1">
+          <p className="cds--type-body-long-01 cds--mt-02">
             {description}
           </p>
         )}
       </Column>
       {actions && (
-        <Column lg={6} md={4} sm={4} className="flex justify-end items-center">
-          <div className="flex gap-2">
+        <Column lg={6} md={4} sm={4} className="cds--col--end">
+          <div className="cds--btn-set">
             {actions}
           </div>
         </Column>

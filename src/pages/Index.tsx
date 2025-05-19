@@ -1,76 +1,88 @@
 
-import { useState } from "react";
 import Layout from "@/components/layout/Layout";
+import { 
+  Grid, 
+  Column, 
+  Tile,
+  Section 
+} from "@carbon/react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import MigrationSummary from "@/components/dashboard/MigrationSummary";
 import RecentMigrations from "@/components/dashboard/RecentMigrations";
 import QuickActions from "@/components/dashboard/QuickActions";
-import { Info } from "lucide-react";
+import { InformationFilled } from "@carbon/icons-react";
 
 const Index = () => {
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="bg-carbon-blue-70 -mx-6 -mt-6 px-6 py-8 text-white">
-          <h1 className="text-2xl font-light mb-2">Welcome to IBM Database Modernization</h1>
-          <p className="opacity-80 max-w-3xl">
-            Automate your database migration from various platforms to IBM databases using our AI-powered conversion tool.
-            Configure your databases, upload scripts, and run migrations with ease.
-          </p>
+      <div className="cds--grid">
+        <div className="cds--row cds--mb-07">
+          <Column lg={16} md={8} sm={4}>
+            <Section className="cds--bg--interactive-01 cds--type--inverse cds--p-05">
+              <h1 className="cds--type-productive-heading-04 cds--mb-03">Welcome to IBM Database Modernization</h1>
+              <p className="cds--type-body-long-01">
+                Automate your database migration from various platforms to IBM databases using our AI-powered conversion tool.
+                Configure your databases, upload scripts, and run migrations with ease.
+              </p>
+            </Section>
+          </Column>
         </div>
 
-        <div className="space-y-6">
-          <section>
-            <h2 className="text-xl font-medium mb-4 text-carbon-gray-100">Migration Summary</h2>
+        <div className="cds--row cds--mb-05">
+          <Column lg={16} md={8} sm={4}>
+            <h2 className="cds--type-productive-heading-03 cds--mb-04">Migration Summary</h2>
             <MigrationSummary />
-          </section>
-          
-          <section>
-            <h2 className="text-xl font-medium mb-4 text-carbon-gray-100">Quick Actions</h2>
+          </Column>
+        </div>
+        
+        <div className="cds--row cds--mb-05">
+          <Column lg={16} md={8} sm={4}>
+            <h2 className="cds--type-productive-heading-03 cds--mb-04">Quick Actions</h2>
             <QuickActions />
-          </section>
-          
-          <section>
+          </Column>
+        </div>
+        
+        <div className="cds--row cds--mb-05">
+          <Column lg={16} md={8} sm={4}>
             <DashboardCard 
               title="Recent Migrations"
               action={
-                <a href="/migrations" className="text-carbon-blue text-sm hover:underline">
-                  View all
-                </a>
+                <Link href="/migrations" className="cds--link">View all</Link>
               }
-              className="overflow-hidden"
             >
               <RecentMigrations />
             </DashboardCard>
-          </section>
-          
-          <section>
+          </Column>
+        </div>
+        
+        <div className="cds--row">
+          <Column lg={16} md={8} sm={4}>
             <DashboardCard title="Getting Started">
-              <div className="flex gap-4 items-start">
-                <div className="p-3 bg-carbon-blue bg-opacity-10 rounded-full">
-                  <Info size={24} className="text-carbon-blue" />
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <div className="cds--bg--interactive-01-hover cds--p-03" style={{ borderRadius: '50%', height: 'fit-content' }}>
+                  <InformationFilled size={24} className="cds--icon--interactive-01" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium mb-2">New to Database Migration?</h3>
-                  <p className="text-carbon-gray-70 mb-4">
+                  <h3 className="cds--type-productive-heading-02 cds--mb-03">New to Database Migration?</h3>
+                  <p className="cds--type-body-long-01 cds--mb-04">
                     Follow these steps to get started with your first migration project:
                   </p>
-                  <ol className="list-decimal list-inside space-y-2 text-carbon-gray-70">
-                    <li>Configure your source and target database connections</li>
-                    <li>Upload your SQL scripts or stored procedures</li>
-                    <li>Run the migration analysis to identify potential issues</li>
-                    <li>Review and approve the converted code</li>
-                    <li>Execute the migration and verify the results</li>
+                  <ol className="cds--list--ordered cds--mb-04">
+                    <li className="cds--list__item">Configure your source and target database connections</li>
+                    <li className="cds--list__item">Upload your SQL scripts or stored procedures</li>
+                    <li className="cds--list__item">Run the migration analysis to identify potential issues</li>
+                    <li className="cds--list__item">Review and approve the converted code</li>
+                    <li className="cds--list__item">Execute the migration and verify the results</li>
                   </ol>
-                  <div className="mt-4">
-                    <a href="/questionnaire/db-migration" className="text-carbon-blue hover:underline">
+                  <div className="cds--mt-04">
+                    <Link href="/questionnaire/db-migration" className="cds--link">
                       Start with our setup wizard →
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
             </DashboardCard>
-          </section>
+          </Column>
         </div>
       </div>
     </Layout>

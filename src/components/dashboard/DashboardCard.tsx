@@ -1,5 +1,5 @@
 
-import { cn } from "@/lib/utils";
+import { Tile } from "@carbon/react";
 
 type DashboardCardProps = {
   title: string;
@@ -8,17 +8,17 @@ type DashboardCardProps = {
   action?: React.ReactNode;
 };
 
-const DashboardCard = ({ title, children, className, action }: DashboardCardProps) => {
+const DashboardCard = ({ title, children, className = "", action }: DashboardCardProps) => {
   return (
-    <div className={cn("bg-white border border-carbon-gray-20 rounded-none", className)}>
-      <div className="flex items-center justify-between border-b border-carbon-gray-20 px-4 py-3">
-        <h2 className="text-carbon-gray-100 font-medium text-base">{title}</h2>
+    <Tile className={className}>
+      <div className="cds--tile-header cds--mb-04">
+        <h2 className="cds--type-productive-heading-03">{title}</h2>
         {action && <div>{action}</div>}
       </div>
-      <div className="p-4">
+      <div>
         {children}
       </div>
-    </div>
+    </Tile>
   );
 };
 

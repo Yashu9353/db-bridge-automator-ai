@@ -1,5 +1,20 @@
 
-import { FileCode, CheckCircle, AlertTriangle, X } from "lucide-react";
+import {
+  DataTable,
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+  Link
+} from "@carbon/react";
+import {
+  Code,
+  CheckmarkFilled,
+  WarningAltFilled,
+  CloseFilled
+} from "@carbon/icons-react";
 
 type Migration = {
   id: string;
@@ -47,56 +62,73 @@ const recentMigrations: Migration[] = [
 
 const StatusIcon = ({ status }: { status: Migration["status"] }) => {
   if (status === "success") {
-    return <CheckCircle size={16} className="text-carbon-success" />;
+    return <CheckmarkFilled size={16} className="cds--icon--support-02" />;
   }
   if (status === "warning") {
-    return <AlertTriangle size={16} className="text-carbon-warning" />;
+    return <WarningAltFilled size={16} className="cds--icon--support-03" />;
   }
-  return <X size={16} className="text-carbon-error" />;
+  return <CloseFilled size={16} className="cds--icon--support-01" />;
 };
 
+const headers = [
+  { key: 'name', header: 'Name' },
+  { key: 'source', header: 'Source' },
+  { key: 'target', header: 'Target' },
+  { key: 'date', header: 'Date' },
+  { key: 'status', header: 'Status' },
+];
+
 const RecentMigrations = () => {
+  const rows = recentMigrations.map(migration => ({
+    id: migration.id,
+    name: (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Code size={16} className="cds--icon--interactive-01" />
+        <Link href={`/migration/${migration.id}`}>
+          {migration.name}
+        </Link>
+      </div>
+    ),
+    source: migration.source,
+    target: migration.target,
+    date: migration.date,
+    status: (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <StatusIcon status={migration.status} />
+        <span>
+          {migration.status === "success" && "Successful"}
+          {migration.status === "warning" && "Warnings"}
+          {migration.status === "error" && "Failed"}
+        </span>
+      </div>
+    ),
+  }));
+
   return (
-    <div className="overflow-x-auto">
-      <table className="carbon-table">
-        <thead>
-          <tr>
-            <th className="carbon-table-header">Name</th>
-            <th className="carbon-table-header">Source</th>
-            <th className="carbon-table-header">Target</th>
-            <th className="carbon-table-header">Date</th>
-            <th className="carbon-table-header">Status</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-carbon-gray-20">
-          {recentMigrations.map((migration) => (
-            <tr key={migration.id}>
-              <td className="carbon-table-cell">
-                <div className="flex items-center gap-3">
-                  <FileCode size={16} className="text-carbon-blue" />
-                  <a href={`/migration/${migration.id}`} className="text-carbon-blue hover:underline">
-                    {migration.name}
-                  </a>
-                </div>
-              </td>
-              <td className="carbon-table-cell">{migration.source}</td>
-              <td className="carbon-table-cell">{migration.target}</td>
-              <td className="carbon-table-cell">{migration.date}</td>
-              <td className="carbon-table-cell">
-                <div className="flex items-center gap-2">
-                  <StatusIcon status={migration.status} />
-                  <span>
-                    {migration.status === "success" && "Successful"}
-                    {migration.status === "warning" && "Warnings"}
-                    {migration.status === "error" && "Failed"}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable rows={rows} headers={headers}>
+      {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+        <Table {...getTableProps()} size="compact">
+          <TableHead>
+            <TableRow>
+              {headers.map((header) => (
+                <TableHeader {...getHeaderProps({ header })}>
+                  {header.header}
+                </TableHeader>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow {...getRowProps({ row })}>
+                {row.cells.map((cell) => (
+                  <TableCell key={cell.id}>{cell.value}</TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </DataTable>
   );
 };
 

@@ -1,7 +1,12 @@
 
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { 
+  FormLabel, 
+  Select, 
+  SelectItem, 
+  Stack, 
+  Toggle, 
+  Tile 
+} from "@carbon/react";
 
 type PreferencesStepProps = {
   optimizationLevel: string;
@@ -12,54 +17,66 @@ type PreferencesStepProps = {
 
 const PreferencesStep = ({ optimizationLevel, strictMode, useFeedbackDb, updateFormData }: PreferencesStepProps) => {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-medium text-carbon-gray-100">Preferences</h2>
-      <p className="text-carbon-gray-70">Configure your conversion preferences</p>
+    <div className="cds--form">
+      <h2 className="cds--type-productive-heading-03 cds--mb-04">Preferences</h2>
+      <p className="cds--type-body-long-01 cds--mb-05">Configure your conversion preferences</p>
       
-      <div className="space-y-5">
+      <Stack gap={7}>
         <div>
-          <Label htmlFor="optimizationLevel" className="carbon-label">Optimization Level</Label>
+          <FormLabel>Optimization Level</FormLabel>
           <Select
+            id="optimizationLevel"
+            labelText=""
             value={optimizationLevel}
-            onValueChange={(value) => updateFormData("optimizationLevel", value)}
+            onChange={(e) => updateFormData("optimizationLevel", e.target.value)}
+            className="cds--mb-05"
           >
-            <SelectTrigger className="carbon-field">
-              <SelectValue placeholder="Select optimization level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="minimal">Minimal - Focus on compatibility</SelectItem>
-              <SelectItem value="moderate">Moderate - Balance compatibility and performance</SelectItem>
-              <SelectItem value="aggressive">Aggressive - Focus on performance optimization</SelectItem>
-            </SelectContent>
+            <SelectItem value="minimal" text="Minimal - Focus on compatibility" />
+            <SelectItem value="moderate" text="Moderate - Balance compatibility and performance" />
+            <SelectItem value="aggressive" text="Aggressive - Focus on performance optimization" />
           </Select>
         </div>
         
-        <div className="flex items-center justify-between border border-carbon-gray-30 p-4">
-          <div>
-            <Label className="text-base font-medium">Strict Mode</Label>
-            <p className="text-sm text-carbon-gray-60">
-              Enforce strict SQL syntax compatibility during conversion
-            </p>
+        <Tile className="cds--mb-03">
+          <div className="cds--form-item">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <FormLabel>Strict Mode</FormLabel>
+                <p className="cds--type-body-short-01 cds--mt-02">
+                  Enforce strict SQL syntax compatibility during conversion
+                </p>
+              </div>
+              <Toggle
+                id="strictMode"
+                labelA=""
+                labelB=""
+                toggled={strictMode}
+                onToggle={(toggled) => updateFormData("strictMode", toggled)}
+              />
+            </div>
           </div>
-          <Switch
-            checked={strictMode}
-            onCheckedChange={(checked) => updateFormData("strictMode", checked)}
-          />
-        </div>
+        </Tile>
         
-        <div className="flex items-center justify-between border border-carbon-gray-30 p-4">
-          <div>
-            <Label className="text-base font-medium">Use Feedback Database</Label>
-            <p className="text-sm text-carbon-gray-60">
-              Store conversion feedback to improve future migrations
-            </p>
+        <Tile>
+          <div className="cds--form-item">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <FormLabel>Use Feedback Database</FormLabel>
+                <p className="cds--type-body-short-01 cds--mt-02">
+                  Store conversion feedback to improve future migrations
+                </p>
+              </div>
+              <Toggle
+                id="useFeedbackDb"
+                labelA=""
+                labelB=""
+                toggled={useFeedbackDb}
+                onToggle={(toggled) => updateFormData("useFeedbackDb", toggled)}
+              />
+            </div>
           </div>
-          <Switch
-            checked={useFeedbackDb}
-            onCheckedChange={(checked) => updateFormData("useFeedbackDb", checked)}
-          />
-        </div>
-      </div>
+        </Tile>
+      </Stack>
     </div>
   );
 };

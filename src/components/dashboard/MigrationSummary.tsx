@@ -1,36 +1,43 @@
 
-import { BarChart2, ArrowUpRight, CheckCircle, AlertTriangle, X } from "lucide-react";
+import { Grid, Column, Tile } from "@carbon/react";
+import {
+  ChartColumnFloating,
+  CheckmarkFilled,
+  WarningAltFilled,
+  CloseFilled
+} from "@carbon/icons-react";
 
 const MigrationSummary = () => {
   const stats = [
-    { label: "Total Scripts", value: 128, icon: BarChart2, color: "text-carbon-blue" },
-    { label: "Successfully Converted", value: 89, icon: CheckCircle, color: "text-carbon-success" },
-    { label: "Warnings", value: 32, icon: AlertTriangle, color: "text-carbon-warning" },
-    { label: "Failed", value: 7, icon: X, color: "text-carbon-error" },
+    { label: "Total Scripts", value: 128, icon: ChartColumnFloating, color: "interactive-01" },
+    { label: "Successfully Converted", value: 89, icon: CheckmarkFilled, color: "support-02" },
+    { label: "Warnings", value: 32, icon: WarningAltFilled, color: "support-03" },
+    { label: "Failed", value: 7, icon: CloseFilled, color: "support-01" },
   ];
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <Grid condensed>
       {stats.map((stat) => (
-        <div 
-          key={stat.label}
-          className="bg-white border border-carbon-gray-20 p-4 flex flex-col"
-        >
-          <div className="flex justify-between items-center mb-4">
-            <span className={`${stat.color}`}>
-              <stat.icon size={24} />
-            </span>
-            <ArrowUpRight size={16} className="text-carbon-gray-60" />
-          </div>
-          <div className="mt-auto">
-            <div className="text-2xl font-semibold text-carbon-gray-100 mb-1">
-              {stat.value}
+        <Column sm={4} md={4} lg={4} key={stat.label}>
+          <Tile>
+            <div className="cds--tile-content">
+              <div className="cds--mb-04" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <stat.icon size={24} className={`cds--icon--${stat.color}`} />
+                <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.3 3.7L13.1 7.5 9.3 11.3 8.6 10.6 11.2 8 3 8 3 7 11.2 7 8.6 4.4z" />
+                </svg>
+              </div>
+              <div>
+                <div className="cds--type-productive-heading-03 cds--mb-02">
+                  {stat.value}
+                </div>
+                <div className="cds--type-body-short-01">{stat.label}</div>
+              </div>
             </div>
-            <div className="text-sm text-carbon-gray-60">{stat.label}</div>
-          </div>
-        </div>
+          </Tile>
+        </Column>
       ))}
-    </div>
+    </Grid>
   );
 };
 

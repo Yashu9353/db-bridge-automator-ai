@@ -1,23 +1,34 @@
 
 import Layout from "@/components/layout/Layout";
-import DatabaseConnector from "@/components/migration/DatabaseConnector";
+import { Grid, Column } from "@carbon/react";
 
 const DatabaseConnections = () => {
   return (
     <Layout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-medium text-carbon-gray-100">Database Connections</h1>
-          <p className="text-carbon-gray-70 mt-1">
+      <Grid narrow>
+        <Column lg={16} md={8} sm={4}>
+          <h1 className="cds--type-productive-heading-04 cds--mb-03">Database Connections</h1>
+          <p className="cds--type-body-long-01 cds--mb-05">
             Configure your source and target database connections
           </p>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <DatabaseConnector type="source" title="Source Database" />
-          <DatabaseConnector type="target" title="Target Database" />
-        </div>
-      </div>
+          
+          <Grid condensed>
+            <Column lg={8} md={4} sm={4} className="cds--mb-05">
+              <div className="cds--tile">
+                <h2 className="cds--type-productive-heading-03 cds--mb-04">Source Database</h2>
+                {/* DatabaseConnector component would go here */}
+              </div>
+            </Column>
+            
+            <Column lg={8} md={4} sm={4}>
+              <div className="cds--tile">
+                <h2 className="cds--type-productive-heading-03 cds--mb-04">Target Database</h2>
+                {/* DatabaseConnector component would go here */}
+              </div>
+            </Column>
+          </Grid>
+        </Column>
+      </Grid>
     </Layout>
   );
 };

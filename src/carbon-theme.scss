@@ -14,11 +14,18 @@ body {
   font-family: 'IBM Plex Sans', sans-serif;
 }
 
+.cds--content {
+  background-color: var(--cds-background);
+  color: var(--cds-text-01);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
 .cds-carbon-theme {
   @include carbon.theme(themes.$g100);
 }
 
-// Override any custom elements to ensure Carbon Design System consistency
+// Carbon Design System specific classes
 .carbon-button-primary {
   background-color: var(--cds-interactive-01);
   color: var(--cds-text-04);

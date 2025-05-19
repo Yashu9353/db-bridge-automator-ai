@@ -14,7 +14,8 @@ import {
   SideNavItems,
   SideNavLink,
   SideNavMenu,
-  SideNavMenuItem
+  SideNavMenuItem,
+  Content
 } from "@carbon/react";
 import {
   Home,
@@ -68,14 +69,56 @@ const Layout = ({ children }: LayoutProps) => {
                 </HeaderGlobalAction>
               </HeaderGlobalBar>
               
-              {/* Let's remove SideNav to test if it's causing the error */}
+              <SideNav 
+                aria-label="Side navigation" 
+                expanded={isSideNavExpanded}
+                isChildOfHeader
+                isPersistent
+              >
+                <SideNavItems>
+                  <SideNavLink renderIcon={Home} href="/">
+                    Dashboard
+                  </SideNavLink>
+                  <SideNavMenu renderIcon={DataBase} title="Database">
+                    <SideNavMenuItem href="/database/connections">
+                      Connections
+                    </SideNavMenuItem>
+                    <SideNavMenuItem href="/database/schema">
+                      Schema Browser
+                    </SideNavMenuItem>
+                  </SideNavMenu>
+                  <SideNavMenu renderIcon={DocumentAdd} title="SQL Scripts">
+                    <SideNavMenuItem href="/scripts/manage">
+                      Manage Scripts
+                    </SideNavMenuItem>
+                    <SideNavMenuItem href="/scripts/upload">
+                      Upload Scripts
+                    </SideNavMenuItem>
+                  </SideNavMenu>
+                  <SideNavLink renderIcon={Play} href="/run">
+                    Run Migrations
+                  </SideNavLink>
+                  <SideNavLink renderIcon={CheckmarkOutline} href="/validation">
+                    Validation Results
+                  </SideNavLink>
+                  <SideNavLink renderIcon={WarningAlt} href="/issues">
+                    Issues & Fixes
+                  </SideNavLink>
+                  <SideNavLink renderIcon={ChartLineData} href="/reports">
+                    Reports
+                  </SideNavLink>
+                  <SideNavLink renderIcon={Settings} href="/settings">
+                    Settings
+                  </SideNavLink>
+                </SideNavItems>
+              </SideNav>
             </Header>
           </>
         )}
       />
-      <div className={`cds--content ${isSideNavExpanded ? 'cds--content--expanded' : ''}`}>
+      <Content className={isSideNavExpanded ? 'cds--content--expanded' : ''}>
         {children}
-      </div>
+      </Content>
     </>
   );
 };

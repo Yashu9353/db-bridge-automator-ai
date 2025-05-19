@@ -1,8 +1,12 @@
 
 // Import Carbon component styles
 @use '@carbon/react' as carbon;
-@use '@carbon/react/scss/spacing' as *;
-@use '@carbon/react/scss/type' as *;
+@use '@carbon/react/scss/spacing';
+@use '@carbon/react/scss/type';
+@use '@carbon/react/scss/grid';
+@use '@carbon/react/scss/layer';
+@use '@carbon/react/scss/motion';
+@use '@carbon/colors';
 
 // Carbon theme styles
 @import './carbon-theme.scss';
@@ -11,94 +15,82 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 // Custom Carbon spacing utility classes
-.mb-01 {
-  margin-bottom: $spacing-01;
-}
-.mb-02 {
-  margin-bottom: $spacing-02;
-}
-.mb-03 {
-  margin-bottom: $spacing-03;
-}
-.mb-04 {
-  margin-bottom: $spacing-04;
-}
-.mb-05 {
-  margin-bottom: $spacing-05;
-}
-.mb-06 {
-  margin-bottom: $spacing-06;
-}
-.mb-07 {
-  margin-bottom: $spacing-07;
-}
-.mb-08 {
-  margin-bottom: $spacing-08;
-}
-.mb-09 {
-  margin-bottom: $spacing-09;
+@each $name, $value in spacing.$spacing {
+  .cds--mb-#{$name} {
+    margin-bottom: $value;
+  }
+  
+  .cds--mt-#{$name} {
+    margin-top: $value;
+  }
+  
+  .cds--ml-#{$name} {
+    margin-left: $value;
+  }
+  
+  .cds--mr-#{$name} {
+    margin-right: $value;
+  }
+  
+  .cds--p-#{$name} {
+    padding: $value;
+  }
 }
 
-.mt-01 {
-  margin-top: $spacing-01;
-}
-.mt-02 {
-  margin-top: $spacing-02;
-}
-.mt-03 {
-  margin-top: $spacing-03;
-}
-.mt-04 {
-  margin-top: $spacing-04;
-}
-.mt-05 {
-  margin-top: $spacing-05;
-}
-.mt-06 {
-  margin-top: $spacing-06;
-}
-.mt-07 {
-  margin-top: $spacing-07;
-}
-.mt-08 {
-  margin-top: $spacing-08;
-}
-.mt-09 {
-  margin-top: $spacing-09;
+// Typography classes
+.cds--type-productive-heading-01 {
+  @include type.productive-heading-01;
 }
 
-// Use Carbon's productive type scale
-.text-productive-heading-01 {
-  @include productive-heading-01;
-}
-.text-productive-heading-02 {
-  @include productive-heading-02;
-}
-.text-productive-heading-03 {
-  @include productive-heading-03;
-}
-.text-productive-heading-04 {
-  @include productive-heading-04;
-}
-.text-productive-heading-05 {
-  @include productive-heading-05;
-}
-.text-productive-heading-06 {
-  @include productive-heading-06;
-}
-.text-productive-heading-07 {
-  @include productive-heading-07;
+.cds--type-productive-heading-02 {
+  @include type.productive-heading-02;
 }
 
-.text-body-short-01 {
-  @include body-short-01;
+.cds--type-productive-heading-03 {
+  @include type.productive-heading-03;
 }
-.text-body-short-02 {
-  @include body-short-02;
+
+.cds--type-productive-heading-04 {
+  @include type.productive-heading-04;
 }
-.text-body-long-01 {
-  @include body-long-01;
+
+.cds--type-productive-heading-05 {
+  @include type.productive-heading-05;
 }
-.text-body-long-02 {
-  @include body-long-02;
+
+.cds--type-productive-heading-06 {
+  @include type.productive-heading-06;
+}
+
+.cds--type-productive-heading-07 {
+  @include type.productive-heading-07;
+}
+
+.cds--type-body-short-01 {
+  @include type.body-short-01;
+}
+
+.cds--type-body-short-02 {
+  @include type.body-short-02;
+}
+
+.cds--type-body-long-01 {
+  @include type.body-long-01;
+}
+
+.cds--type-body-long-02 {
+  @include type.body-long-02;
+}
+
+// Carbon helpers
+.cds--visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

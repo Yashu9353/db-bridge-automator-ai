@@ -1,6 +1,5 @@
 
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormLabel, Select, SelectItem, Stack } from "@carbon/react";
 
 type SourceTargetStepProps = {
   sourceDb: string;
@@ -10,47 +9,44 @@ type SourceTargetStepProps = {
 
 const SourceTargetStep = ({ sourceDb, targetDb, updateFormData }: SourceTargetStepProps) => {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-medium text-carbon-gray-100">Source & Target Database</h2>
-      <p className="text-carbon-gray-70">Select your source database type and target IBM database</p>
+    <div className="cds--form">
+      <h2 className="cds--type-productive-heading-03 cds--mb-04">Source & Target Database</h2>
+      <p className="cds--type-body-long-01 cds--mb-05">Select your source database type and target IBM database</p>
       
-      <div className="space-y-4">
+      <Stack gap={7}>
         <div>
-          <Label htmlFor="sourceDb" className="carbon-label">Source Database</Label>
+          <FormLabel>Source Database</FormLabel>
           <Select
+            id="sourceDb"
+            labelText=""
             value={sourceDb}
-            onValueChange={(value) => updateFormData("sourceDb", value)}
+            onChange={(e) => updateFormData("sourceDb", e.target.value)}
+            className="cds--mb-05"
           >
-            <SelectTrigger className="carbon-field">
-              <SelectValue placeholder="Select source database" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="teradata">Teradata</SelectItem>
-              <SelectItem value="oracle">Oracle</SelectItem>
-              <SelectItem value="sqlserver">SQL Server</SelectItem>
-              <SelectItem value="postgresql">PostgreSQL</SelectItem>
-              <SelectItem value="mysql">MySQL</SelectItem>
-            </SelectContent>
+            <SelectItem value="" text="Select source database" disabled hidden />
+            <SelectItem value="teradata" text="Teradata" />
+            <SelectItem value="oracle" text="Oracle" />
+            <SelectItem value="sqlserver" text="SQL Server" />
+            <SelectItem value="postgresql" text="PostgreSQL" />
+            <SelectItem value="mysql" text="MySQL" />
           </Select>
         </div>
         
         <div>
-          <Label htmlFor="targetDb" className="carbon-label">Target Database</Label>
+          <FormLabel>Target Database</FormLabel>
           <Select
+            id="targetDb"
+            labelText=""
             value={targetDb}
-            onValueChange={(value) => updateFormData("targetDb", value)}
+            onChange={(e) => updateFormData("targetDb", e.target.value)}
           >
-            <SelectTrigger className="carbon-field">
-              <SelectValue placeholder="Select target database" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="db2">IBM Db2</SelectItem>
-              <SelectItem value="db2-cloud">IBM Db2 on Cloud</SelectItem>
-              <SelectItem value="db2-warehouse">IBM Db2 Warehouse</SelectItem>
-            </SelectContent>
+            <SelectItem value="" text="Select target database" disabled hidden />
+            <SelectItem value="db2" text="IBM Db2" />
+            <SelectItem value="db2-cloud" text="IBM Db2 on Cloud" />
+            <SelectItem value="db2-warehouse" text="IBM Db2 Warehouse" />
           </Select>
         </div>
-      </div>
+      </Stack>
     </div>
   );
 };
