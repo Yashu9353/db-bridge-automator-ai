@@ -48,7 +48,6 @@ const SourceTargetStep: React.FC<SourceTargetStepProps> = ({ updateStepData, ste
         <ComboBox
           id="source-database"
           titleText=""
-          label="Select source database"
           items={sourceOptions}
           initialSelectedItem={sourceOptions.find(item => item.id === sourceDatabase)}
           onChange={handleSourceChange}
@@ -61,7 +60,6 @@ const SourceTargetStep: React.FC<SourceTargetStepProps> = ({ updateStepData, ste
         <ComboBox
           id="target-database"
           titleText=""
-          label="Select target database"
           items={targetOptions}
           initialSelectedItem={targetOptions.find(item => item.id === targetDatabase)}
           onChange={handleTargetChange}

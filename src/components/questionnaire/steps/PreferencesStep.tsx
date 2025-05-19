@@ -55,7 +55,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({ updateStepData, stepD
         <ComboBox
           id="optimization-level"
           titleText=""
-          label="Select optimization level"
           items={optimizationLevels}
           initialSelectedItem={optimizationLevels.find(item => item.id === optimizationLevel)}
           onChange={handleOptimizationChange}

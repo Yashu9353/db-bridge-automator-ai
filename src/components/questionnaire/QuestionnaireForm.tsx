@@ -39,6 +39,10 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
+  const updateStepData = (data: any) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
+
   const nextStep = () => {
     setCurrentStep((prev) => Math.min(prev + 1, questionnaireSteps.length - 1));
   };
@@ -54,9 +58,8 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
 
         {currentStep === 0 && (
           <SourceTargetStep 
-            sourceDb={formData.sourceDb}
-            targetDb={formData.targetDb}
-            updateFormData={updateFormData}
+            stepData={formData}
+            updateStepData={updateStepData}
           />
         )}
 
@@ -69,10 +72,8 @@ const QuestionnaireForm = ({ questionnaireId }: QuestionnaireFormProps) => {
 
         {currentStep === 2 && (
           <PreferencesStep 
-            optimizationLevel={formData.optimizationLevel}
-            strictMode={formData.strictMode}
-            useFeedbackDb={formData.useFeedbackDb}
-            updateFormData={updateFormData}
+            stepData={formData}
+            updateStepData={updateStepData}
           />
         )}
 

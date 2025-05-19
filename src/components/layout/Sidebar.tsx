@@ -50,7 +50,6 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
       <SideNav 
         expanded={isOpen}
         aria-label="Side navigation"
-        isRail={!isOpen}
       >
         <SideNavItems>
           <SideNavLink renderIcon={Home} href="/" isActive={location.pathname === '/'}>

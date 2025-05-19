@@ -1,4 +1,5 @@
 
+import React from "react";
 import {
   DataTable,
   Table,
@@ -16,7 +17,6 @@ import {
   WarningAltFilled,
   ErrorFilled
 } from "@carbon/icons-react";
-import React from "react";
 
 type Migration = {
   id: string;
@@ -73,7 +73,7 @@ const StatusTag = ({ status }: { status: Migration["status"] }) => {
   }
   if (status === "warning") {
     return (
-      <Tag type="yellow" size="sm">
+      <Tag type="cyan" size="sm">
         <WarningAltFilled size={16} className="cds--tag__icon" />
         Warnings
       </Tag>
