@@ -1,8 +1,7 @@
+
 import { useState, useContext } from "react";
 import { 
-  Home, Database, FileCode, Play, 
-  CheckSquare, AlertTriangle, BarChart, Settings, 
-  Users, ChevronRight, ChevronDown, LogOut 
+  Home, Database, FileCode, Play, Users, ChevronRight, ChevronDown, LogOut 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
@@ -40,10 +39,6 @@ const navItems: NavItem[] = [
     ] 
   },
   { label: "Run Migrations", icon: Play, href: "/run" },
-  { label: "Validation Results", icon: CheckSquare, href: "/validation" },
-  { label: "Issues & Fixes", icon: AlertTriangle, href: "/issues" },
-  { label: "Reports", icon: BarChart, href: "/reports" },
-  { label: "Settings", icon: Settings, href: "/settings" },
   { label: "User Management", icon: Users, href: "/users" },
 ];
 
