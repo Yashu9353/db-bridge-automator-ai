@@ -1,6 +1,7 @@
 
 // Import Carbon component styles
-@use '@carbon/react';
+@use '@carbon/react' as react;
+@use '@carbon/react/scss/spacing' as *;
 
 // Carbon theme styles
 @import './carbon-theme.scss';
@@ -67,36 +68,36 @@
 
 // Use Carbon's productive type scale
 .text-productive-heading-01 {
-  @include carbon-react.productive-heading-01;
+  @include react.productive-heading-01;
 }
 .text-productive-heading-02 {
-  @include carbon-react.productive-heading-02;
+  @include react.productive-heading-02;
 }
 .text-productive-heading-03 {
-  @include carbon-react.productive-heading-03;
+  @include react.productive-heading-03;
 }
 .text-productive-heading-04 {
-  @include carbon-react.productive-heading-04;
+  @include react.productive-heading-04;
 }
 .text-productive-heading-05 {
-  @include carbon-react.productive-heading-05;
+  @include react.productive-heading-05;
 }
 .text-productive-heading-06 {
-  @include carbon-react.productive-heading-06;
+  @include react.productive-heading-06;
 }
 .text-productive-heading-07 {
-  @include carbon-react.productive-heading-07;
+  @include react.productive-heading-07;
 }
 
 .text-body-short-01 {
-  @include carbon-react.body-short-01;
+  @include react.body-short-01;
 }
 .text-body-short-02 {
-  @include carbon-react.body-short-02;
+  @include react.body-short-02;
 }
 .text-body-long-01 {
-  @include carbon-react.body-long-01;
+  @include react.body-long-01;
 }
 .text-body-long-02 {
-  @include carbon-react.body-long-02;
+  @include react.body-long-02;
 }
