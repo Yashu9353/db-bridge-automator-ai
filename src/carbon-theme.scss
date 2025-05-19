@@ -1,10 +1,10 @@
 
 // Import Carbon themes
 @use '@carbon/react/scss/themes';
-@use '@carbon/react';
+@use '@carbon/react' as carbon;
 
 :root {
-  @include react.theme(themes.$g100);
+  @include carbon.theme(themes.$g100);
 }
 
 // IBM Carbon Design System specific element styling
@@ -15,7 +15,7 @@ body {
 }
 
 .cds-carbon-theme {
-  @include react.theme(themes.$g100);
+  @include carbon.theme(themes.$g100);
 }
 
 // Override any custom elements to ensure Carbon Design System consistency
