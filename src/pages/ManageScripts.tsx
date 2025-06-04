@@ -1,7 +1,7 @@
 
 import Layout from "@/components/layout/Layout";
 import FileUploader from "@/components/migration/FileUploader";
-import { Info, Plus, FileCode, Search, Edit, Eye, Trash, AlertTriangle } from "lucide-react";
+import { Info, Plus, FileCode, Search, Edit, Eye, Trash, AlertTriangle, Activity, Code, Settings, Wrench, Coffee, Cpu, Key } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,15 @@ const scriptSamples = [
   { id: 'script2', name: 'inventory_update.bteq', type: 'BTEQ', size: '18KB', lastModified: '2023-06-14', status: 'Valid' },
   { id: 'script3', name: 'sales_report.sql', type: 'SQL', size: '5KB', lastModified: '2023-06-12', status: 'With Warnings' },
   { id: 'script4', name: 'product_import.sql', type: 'SQL', size: '22KB', lastModified: '2023-06-10', status: 'Valid' },
-  { id: 'script5', name: 'user_permissions.sql', type: 'SQL', size: '3KB', lastModified: '2023-06-08', status: 'Invalid' }
+  { id: 'script5', name: 'user_permissions.sql', type: 'SQL', size: '3KB', lastModified: '2023-06-08', status: 'Invalid' },
+  { id: 'script6', name: 'create_tables.ddl', type: 'DDL', size: '15KB', lastModified: '2023-06-16', status: 'Valid' },
+  { id: 'script7', name: 'backup_procedure.spl', type: 'Store SPL', size: '8KB', lastModified: '2023-06-13', status: 'Valid' },
+  { id: 'script8', name: 'transaction_control.tcl', type: 'TCL', size: '6KB', lastModified: '2023-06-11', status: 'Valid' },
+  { id: 'script9', name: 'workload_manager.wlm', type: 'WLM', size: '10KB', lastModified: '2023-06-09', status: 'Valid' },
+  { id: 'script10', name: 'analytics_report.sas', type: 'SAS', size: '25KB', lastModified: '2023-06-07', status: 'Valid' },
+  { id: 'script11', name: 'data_conversion.java', type: 'DCW - Java program', size: '35KB', lastModified: '2023-06-06', status: 'Valid' },
+  { id: 'script12', name: 'ai_procedure.spl', type: 'SPL - AI', size: '12KB', lastModified: '2023-06-05', status: 'Valid' },
+  { id: 'script13', name: 'grant_permissions.dcl', type: 'DCL', size: '4KB', lastModified: '2023-06-04', status: 'Valid' }
 ];
 
 const ManageScripts = () => {
@@ -61,13 +69,10 @@ const ManageScripts = () => {
     script.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredSqlScripts = filteredScripts.filter(script => 
-    script.type === 'SQL'
-  );
-
-  const filteredBteqScripts = filteredScripts.filter(script => 
-    script.type === 'BTEQ'
-  );
+  // Filter functions for each script type
+  const getFilteredScripts = (type: string) => {
+    return filteredScripts.filter(script => script.type === type);
+  };
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -132,6 +137,90 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY region ORDER BY sales DESC) = 1;`,
     });
   };
 
+  // Render script table
+  const renderScriptTable = (scriptList: any[], showType = true) => (
+    <div className="border rounded-md">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            {showType && <TableHead>Type</TableHead>}
+            <TableHead>Size</TableHead>
+            <TableHead>Last Modified</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {scriptList.map((script) => (
+            <TableRow key={script.id}>
+              <TableCell className="flex items-center gap-2">
+                <FileCode size={16} className="text-carbon-blue" />
+                <span className="font-medium">{script.name}</span>
+              </TableCell>
+              {showType && <TableCell>{script.type}</TableCell>}
+              <TableCell>{script.size}</TableCell>
+              <TableCell>{script.lastModified}</TableCell>
+              <TableCell>
+                <span className={getStatusColor(script.status)}>
+                  {script.status}
+                </span>
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex gap-1 items-center"
+                    onClick={() => toast({
+                      title: "Edit Script",
+                      description: "Editor functionality would open here"
+                    })}
+                  >
+                    <Edit size={14} />
+                    Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex gap-1 items-center"
+                    onClick={() => handleViewScript(script.id)}
+                  >
+                    <Eye size={14} />
+                    View
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex gap-1 items-center" 
+                    onClick={() => handleMigrate(script.id)}
+                  >
+                    Migrate
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-carbon-error border-carbon-error/20 hover:bg-carbon-error/10"
+                    onClick={() => handleDelete(script.id)}
+                  >
+                    <Trash size={14} />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+          {scriptList.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={showType ? 6 : 5} className="text-center py-6 text-muted-foreground">
+                No scripts found. Try a different search or upload new scripts.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -143,10 +232,18 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY region ORDER BY sales DESC) = 1;`,
         </div>
         
         <Tabs defaultValue="all" className="w-full">
-          <TabsList>
+          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
             <TabsTrigger value="all">All Scripts</TabsTrigger>
             <TabsTrigger value="sql">SQL</TabsTrigger>
             <TabsTrigger value="bteq">BTEQ</TabsTrigger>
+            <TabsTrigger value="stored-procedures">Stored procedures</TabsTrigger>
+            <TabsTrigger value="ddl">DDL</TabsTrigger>
+            <TabsTrigger value="store-spl">Store SPL</TabsTrigger>
+            <TabsTrigger value="tcl">TCL</TabsTrigger>
+            <TabsTrigger value="wlm">WLM</TabsTrigger>
+            <TabsTrigger value="sas">SAS</TabsTrigger>
+            <TabsTrigger value="dcw">DCW - Java</TabsTrigger>
+            <TabsTrigger value="spl-ai">SPL - AI</TabsTrigger>
             <TabsTrigger value="upload">Upload New</TabsTrigger>
           </TabsList>
           
@@ -169,86 +266,7 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY region ORDER BY sales DESC) = 1;`,
               </Button>
             </div>
             
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Size</TableHead>
-                    <TableHead>Last Modified</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredScripts.map((script) => (
-                    <TableRow key={script.id}>
-                      <TableCell className="flex items-center gap-2">
-                        <FileCode size={16} className="text-carbon-blue" />
-                        <span className="font-medium">{script.name}</span>
-                      </TableCell>
-                      <TableCell>{script.type}</TableCell>
-                      <TableCell>{script.size}</TableCell>
-                      <TableCell>{script.lastModified}</TableCell>
-                      <TableCell>
-                        <span className={getStatusColor(script.status)}>
-                          {script.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex gap-1 items-center"
-                            onClick={() => toast({
-                              title: "Edit Script",
-                              description: "Editor functionality would open here"
-                            })}
-                          >
-                            <Edit size={14} />
-                            Edit
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="flex gap-1 items-center"
-                            onClick={() => handleViewScript(script.id)}
-                          >
-                            <Eye size={14} />
-                            View
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="flex gap-1 items-center" 
-                            onClick={() => handleMigrate(script.id)}
-                          >
-                            Migrate
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="text-carbon-error border-carbon-error/20 hover:bg-carbon-error/10"
-                            onClick={() => handleDelete(script.id)}
-                          >
-                            <Trash size={14} />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {filteredScripts.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                        No scripts found. Try a different search or upload new scripts.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            {renderScriptTable(filteredScripts)}
           </TabsContent>
           
           <TabsContent value="sql" className="space-y-4">
@@ -270,56 +288,7 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY region ORDER BY sales DESC) = 1;`,
               </Button>
             </div>
             
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Size</TableHead>
-                    <TableHead>Last Modified</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredSqlScripts.map((script) => (
-                    <TableRow key={script.id}>
-                      <TableCell className="flex items-center gap-2">
-                        <FileCode size={16} className="text-carbon-blue" />
-                        <span className="font-medium">{script.name}</span>
-                      </TableCell>
-                      <TableCell>{script.size}</TableCell>
-                      <TableCell>{script.lastModified}</TableCell>
-                      <TableCell>
-                        <span className={getStatusColor(script.status)}>
-                          {script.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">Edit</Button>
-                          <Button variant="outline" size="sm" onClick={() => handleViewScript(script.id)}>View</Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleMigrate(script.id)}
-                          >
-                            Migrate
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {filteredSqlScripts.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                        No SQL scripts found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            {renderScriptTable(getFilteredScripts('SQL'), false)}
           </TabsContent>
           
           <TabsContent value="bteq" className="space-y-4">
@@ -341,56 +310,183 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY region ORDER BY sales DESC) = 1;`,
               </Button>
             </div>
             
-            <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Size</TableHead>
-                    <TableHead>Last Modified</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredBteqScripts.map((script) => (
-                    <TableRow key={script.id}>
-                      <TableCell className="flex items-center gap-2">
-                        <FileCode size={16} className="text-carbon-blue" />
-                        <span className="font-medium">{script.name}</span>
-                      </TableCell>
-                      <TableCell>{script.size}</TableCell>
-                      <TableCell>{script.lastModified}</TableCell>
-                      <TableCell>
-                        <span className={getStatusColor(script.status)}>
-                          {script.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">Edit</Button>
-                          <Button variant="outline" size="sm" onClick={() => handleViewScript(script.id)}>View</Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleMigrate(script.id)}
-                          >
-                            Migrate
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {filteredBteqScripts.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
-                        No BTEQ scripts found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+            {renderScriptTable(getFilteredScripts('BTEQ'), false)}
+          </TabsContent>
+
+          <TabsContent value="stored-procedures" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search stored procedures..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New Stored Procedure
+              </Button>
             </div>
+            
+            {renderScriptTable(getFilteredScripts('Stored procedures'), false)}
+          </TabsContent>
+
+          <TabsContent value="ddl" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search DDL scripts..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New DDL Script
+              </Button>
+            </div>
+            
+            {renderScriptTable(getFilteredScripts('DDL'), false)}
+          </TabsContent>
+
+          <TabsContent value="store-spl" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search Store SPL scripts..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New Store SPL Script
+              </Button>
+            </div>
+            
+            {renderScriptTable(getFilteredScripts('Store SPL'), false)}
+          </TabsContent>
+
+          <TabsContent value="tcl" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search TCL scripts..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New TCL Script
+              </Button>
+            </div>
+            
+            {renderScriptTable(getFilteredScripts('TCL'), false)}
+          </TabsContent>
+
+          <TabsContent value="wlm" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search WLM scripts..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New WLM Script
+              </Button>
+            </div>
+            
+            {renderScriptTable(getFilteredScripts('WLM'), false)}
+          </TabsContent>
+
+          <TabsContent value="sas" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search SAS scripts..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New SAS Script
+              </Button>
+            </div>
+            
+            {renderScriptTable(getFilteredScripts('SAS'), false)}
+          </TabsContent>
+
+          <TabsContent value="dcw" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search DCW Java programs..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New DCW Java Program
+              </Button>
+            </div>
+            
+            {renderScriptTable(getFilteredScripts('DCW - Java program'), false)}
+          </TabsContent>
+
+          <TabsContent value="spl-ai" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-1/3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    placeholder="Search SPL AI scripts..." 
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="gap-2" onClick={() => navigate('/scripts/upload')}>
+                <Plus size={16} />
+                New SPL AI Script
+              </Button>
+            </div>
+            
+            {renderScriptTable(getFilteredScripts('SPL - AI'), false)}
           </TabsContent>
           
           <TabsContent value="upload" className="space-y-4">
@@ -399,8 +495,8 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY region ORDER BY sales DESC) = 1;`,
               <div>
                 <h3 className="font-medium text-carbon-gray-100">Supported File Types</h3>
                 <p className="text-carbon-gray-70 mt-1">
-                  You can upload .sql, .bteq, or .txt files containing SQL code. 
-                  For best results, each file should contain related queries or a single stored procedure.
+                  You can upload .sql, .bteq, .ddl, .spl, .tcl, .wlm, .sas, .java, or .txt files containing code. 
+                  For best results, each file should contain related queries or a single procedure.
                 </p>
               </div>
             </div>

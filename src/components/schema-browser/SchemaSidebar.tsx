@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Loader2, Database, TableIcon, Activity, FileCode, Key } from "lucide-react";
+import { Loader2, Database, TableIcon, Activity, FileCode, Key, Code, Settings, Wrench, Coffee, BookOpen, Cpu } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import SchemaItem from "./SchemaItem";
 import SidebarItem from "./SidebarItem";
@@ -114,6 +114,54 @@ const SchemaSidebar = ({
                 isActive={activeItem === "BTEQ"}
                 icon={<FileCode size={16} className="text-carbon-orange" />}
                 onClick={() => setActiveItem("BTEQ")}
+              />
+              <SidebarItem 
+                name="Stored procedures" 
+                isActive={activeItem === "Stored procedures"}
+                icon={<Activity size={16} className="text-carbon-purple" />}
+                onClick={() => setActiveItem("Stored procedures")}
+              />
+              <SidebarItem 
+                name="DDL" 
+                isActive={activeItem === "DDL"}
+                icon={<Code size={16} className="text-carbon-blue" />}
+                onClick={() => setActiveItem("DDL")}
+              />
+              <SidebarItem 
+                name="Store SPL" 
+                isActive={activeItem === "Store SPL"}
+                icon={<Activity size={16} className="text-carbon-green" />}
+                onClick={() => setActiveItem("Store SPL")}
+              />
+              <SidebarItem 
+                name="TCL" 
+                isActive={activeItem === "TCL"}
+                icon={<Settings size={16} className="text-carbon-teal" />}
+                onClick={() => setActiveItem("TCL")}
+              />
+              <SidebarItem 
+                name="WLM" 
+                isActive={activeItem === "WLM"}
+                icon={<Wrench size={16} className="text-carbon-gray-70" />}
+                onClick={() => setActiveItem("WLM")}
+              />
+              <SidebarItem 
+                name="SAS" 
+                isActive={activeItem === "SAS"}
+                icon={<Coffee size={16} className="text-carbon-orange" />}
+                onClick={() => setActiveItem("SAS")}
+              />
+              <SidebarItem 
+                name="DCW - Java program" 
+                isActive={activeItem === "DCW - Java program"}
+                icon={<Code size={16} className="text-red-600" />}
+                onClick={() => setActiveItem("DCW - Java program")}
+              />
+              <SidebarItem 
+                name="SPL - AI" 
+                isActive={activeItem === "SPL - AI"}
+                icon={<Cpu size={16} className="text-purple-600" />}
+                onClick={() => setActiveItem("SPL - AI")}
               />
               <SidebarItem 
                 name="DCL" 
