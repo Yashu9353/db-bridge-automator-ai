@@ -1,5 +1,6 @@
 
-import { useState, useContext } from "react";
+import { useState } from "react";
+// import { useContext } from "react";
 import {
   Header as CarbonHeader,
   HeaderGlobalAction,
@@ -11,8 +12,8 @@ import {
   HeaderMenu,
   HeaderMenuItem,
 } from "@carbon/react";
-import { LogOut } from "lucide-react"; // Fixed icon name from Logout to LogOut
-import { AuthContext } from "../../App";
+import { LogOut } from "lucide-react";
+// import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import IBMLogo from "../icons/IBMLogo";
 
@@ -35,13 +36,14 @@ const questionnaires: QuestionnaireItem[] = [
 
 const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
   const [isQuestionnairesOpen, setIsQuestionnairesOpen] = useState(false);
-  const { logout } = useContext(AuthContext);
+  // const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  // COMMENTED OUT - Logout functionality
+  // const handleLogout = () => {
+  //   logout();
+  //   navigate("/login");
+  // };
 
   const handleQuestionnaireClick = (id: string) => {
     console.log(`Navigating to questionnaire: ${id}`);
@@ -79,7 +81,8 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
         </HeaderMenu>
       </HeaderNavigation>
       
-      <HeaderGlobalBar>
+      {/* COMMENTED OUT - Logout button */}
+      {/* <HeaderGlobalBar>
         <HeaderGlobalAction
           aria-label="Log out"
           onClick={handleLogout}
@@ -87,7 +90,7 @@ const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
         >
           <LogOut size={20} />
         </HeaderGlobalAction>
-      </HeaderGlobalBar>
+      </HeaderGlobalBar> */}
     </CarbonHeader>
   );
 };
