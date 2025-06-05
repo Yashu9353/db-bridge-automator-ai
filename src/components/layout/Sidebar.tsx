@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../App";
+// import { AuthContext } from "../../App";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -44,13 +44,14 @@ const navItems: NavItem[] = [
 
 const Sidebar = ({ isOpen }: SidebarProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const { logout } = useContext(AuthContext);
+  // const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  // COMMENTED OUT - Logout functionality
+  // const handleLogout = () => {
+  //   logout();
+  //   navigate("/login");
+  // };
 
   const toggleExpanded = (label: string) => {
     setExpandedItems(prev => 
@@ -136,13 +137,14 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
               <p className="text-xs text-carbon-gray-60">Administrator</p>
             </div>
           </div>
-          <button 
+          {/* COMMENTED OUT - Logout button */}
+          {/* <button 
             className="flex items-center gap-2 text-carbon-gray-70 hover:text-carbon-blue text-sm mt-2"
             onClick={handleLogout}
           >
             <LogOut size={16} />
             <span>Log out</span>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

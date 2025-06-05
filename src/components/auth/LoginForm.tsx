@@ -7,7 +7,7 @@ import {
   Button,
   InlineNotification,
 } from "@carbon/react";
-import { AuthContext } from "../../App";
+// import { AuthContext } from "../../App";
 import { useNavigate } from "react-router-dom";
 import IBMLogo from "../icons/IBMLogo";
 
@@ -15,7 +15,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useContext(AuthContext);
+  // const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,12 +25,13 @@ const LoginForm = () => {
       return;
     }
     
-    const success = login(email, password);
-    if (success) {
-      navigate("/");
-    } else {
-      setError("Login failed. Please check your credentials.");
-    }
+    // COMMENTED OUT - Login functionality
+    // const success = login(email, password);
+    // if (success) {
+    //   navigate("/");
+    // } else {
+    //   setError("Login failed. Please check your credentials.");
+    // }
   };
 
   return (
