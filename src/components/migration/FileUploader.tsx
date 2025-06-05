@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { processSqlFile } from "@/services/databaseService";
+import { useNavigate } from "react-router-dom";
 
 type FileStatus = "idle" | "uploading" | "success" | "error";
 
@@ -22,6 +23,7 @@ type UploadedFile = {
 const FileUploader = () => {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const navigate = useNavigate();
   
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -275,8 +277,8 @@ const FileUploader = () => {
                     description: `Processing ${successfulFiles.length} files for conversion`,
                   });
                   
-                  // Navigate to database connections after uploading
-                  window.location.href = "/database/connections";
+                  // Navigate to database connections page
+                  navigate("/database/connections");
                 }}
               >
                 Continue to Database Connections
